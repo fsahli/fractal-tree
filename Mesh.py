@@ -1,19 +1,28 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu May  7 20:16:20 2015
-
-@author: fsc
+This module contains the mesh class. This class is the triangular surface where the fractal tree is grown. 
 """
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
-import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial import cKDTree
 import collections
 
 class Mesh:
+    """Class that contains the mesh where fractal tree is grown. It must be Wavefront .obj file. Be careful on how the normals are defined. It can change where an specified angle will go.
+    
+    
+    Args:    
+        filename (str): the path and filename of the .obj file with the mesh.
+
+    Attributes:
+        verts (array): a numpy array that contains all the nodes of the mesh. verts[i,j], where i is the node index and j=[0,1,2] is the coordinate (x,y,z).
+        connectivity (array): a numpy array that contains all the connectivity of the triangles of the mesh. connectivity[i,j], where i is the triangle index and j=[0,1,2] is node index.
+        normals (array): a numpy array that contains all the normals of the triangles of the mesh. normals[i,j], where i is the triangle index and j=[0,1,2] is normal coordinate (x,y,z).
+        node_to_tri (dict): a dictionary that relates a node to the triangles that it is connected. It is the inverse relation of connectivity. The triangles are stored as a list for each node.
+        tree (scipy.spatial.cKDTree): a k-d tree to compute the distance from any point to the closest node in the mesh.
+        
+    """
     def __init__(self,filename):
-        verts, norms,connectivity = self.loadOBJ(filename)
+        verts, connectivity = self.loadOBJ(filename)
         self.verts=np.array(verts)
         self.connectivity=np.array(connectivity)
         self.normals=np.zeros(self.connectivity.shape)
@@ -28,6 +37,15 @@ class Mesh:
         self.tree=cKDTree(verts)
         
     def loadOBJ(self,filename):  
+        """This function reads a .obj mesh file
+        
+        Args:
+            filename (str): the path and filename of the .obj file.
+            
+        Returns:
+             verts (array): a numpy array that contains all the nodes of the mesh. verts[i,j], where i is the node index and j=[0,1,2] is the coordinate (x,y,z).
+             connectivity (array): a numpy array that contains all the connectivity of the triangles of the mesh. connectivity[i,j], where i is the triangle index and j=[0,1,2] is node index.
+        """
         numVerts = 0  
         verts = []  
         norms = []   
@@ -50,15 +68,20 @@ class Mesh:
                         con.append(int(w[0])-1)
                         numVerts += 1  
                     connectivity.append(con)
-        return verts, norms,connectivity
+        return verts, connectivity
     
-    def plot_surface(self):
-        fig = plt.figure()
-        ax = fig.gca(projection='3d')        
-        ax.plot_trisurf(self.verts[:,0], self.verts[:,1],self.connectivity, self.verts[:,2], cmap=cm.jet, linewidth=0.2)        
-        plt.show()
+
         
     def project_new_point(self,point):
+        """This function projects any point to the surface defined by the mesh.
+        
+        Args:
+            point (array): coordinates of the point to project.
+            
+        Returns:
+             projected_point (array): the coordinates of the projected point that lies in the surface.
+             intriangle (int): the index of the triangle where the projected point lies. If the point is outside surface, intriangle=-1.
+        """
         #Get the closest point
         d, node=self.tree.query(point)
         #print d, node
