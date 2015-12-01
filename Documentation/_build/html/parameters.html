@@ -1,0 +1,314 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>parameters module &mdash; Fractal Tree 0.1.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Fractal Tree 0.1.1 documentation" href="index.html"/>
+        <link rel="prev" title="Mesh module" href="Mesh.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Fractal Tree
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Branch3D.html">Branch3D module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FractalTree.html">FractalTree module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Mesh.html">Mesh module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">parameters module</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Fractal Tree</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>parameters module</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/parameters.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-parameters">
+<span id="parameters-module"></span><h1>parameters module<a class="headerlink" href="#module-parameters" title="Permalink to this headline">¶</a></h1>
+<p>This module contains the Parameters class that is used to specify the input parameters of the tree.</p>
+<dl class="class">
+<dt id="parameters.Parameters">
+<em class="property">class </em><code class="descclassname">parameters.</code><code class="descname">Parameters</code><a class="reference internal" href="_modules/parameters.html#Parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parameters.Parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to specify the parameters of the fractal tree.</p>
+<dl class="attribute">
+<dt id="parameters.Parameters.meshfile">
+<code class="descname">meshfile</code><a class="headerlink" href="#parameters.Parameters.meshfile" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em></p>
+<p>path and filename to obj file name.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parameters.Parameters.filename">
+<code class="descname">filename</code><a class="headerlink" href="#parameters.Parameters.filename" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em></p>
+<p>name of the output files.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parameters.Parameters.init_node">
+<code class="descname">init_node</code><a class="headerlink" href="#parameters.Parameters.init_node" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy array</em></p>
+<p>the first node of the tree.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parameters.Parameters.second_node">
+<code class="descname">second_node</code><a class="headerlink" href="#parameters.Parameters.second_node" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>numpy array</em></p>
+<p>this point is only used to calculate the initial direction of the tree and is not included in the tree. Please avoid selecting nodes that are connected to the init_node by a single edge in the mesh, because it causes numerical issues.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parameters.Parameters.init_length">
+<code class="descname">init_length</code><a class="headerlink" href="#parameters.Parameters.init_length" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em></p>
+<p>length of the first branch.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parameters.Parameters.N_it">
+<code class="descname">N_it</code><a class="headerlink" href="#parameters.Parameters.N_it" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em></p>
+<p>number of generations of branches.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parameters.Parameters.length">
+<code class="descname">length</code><a class="headerlink" href="#parameters.Parameters.length" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em></p>
+<p>average lenght of the branches in the tree.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parameters.Parameters.branch_angle">
+<code class="descname">branch_angle</code><a class="headerlink" href="#parameters.Parameters.branch_angle" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em></p>
+<p>angle with respect to the direction of the previous branch and the new branch.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parameters.Parameters.w">
+<code class="descname">w</code><a class="headerlink" href="#parameters.Parameters.w" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em></p>
+<p>repulsivity parameter.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parameters.Parameters.l_segment">
+<code class="descname">l_segment</code><a class="headerlink" href="#parameters.Parameters.l_segment" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em></p>
+<p>length of the segments that compose one branch (approximately, because the lenght of the branch is random). It can be interpreted as the element length in a finite element mesh.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parameters.Parameters.Fascicles">
+<code class="descname">Fascicles</code><a class="headerlink" href="#parameters.Parameters.Fascicles" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em></p>
+<p>include one or more straigth branches with different lengths and angles from the initial branch. It is motivated by the fascicles of the left ventricle.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parameters.Parameters.fascicles_angles">
+<code class="descname">fascicles_angles</code><a class="headerlink" href="#parameters.Parameters.fascicles_angles" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em></p>
+<p>angles with respect to the initial branches of the fascicles. Include one per fascicle to include.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parameters.Parameters.fascicles_length">
+<code class="descname">fascicles_length</code><a class="headerlink" href="#parameters.Parameters.fascicles_length" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em></p>
+<p>length  of the fascicles. Include one per fascicle to include. The size must match the size of fascicles_angles.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parameters.Parameters.save">
+<code class="descname">save</code><a class="headerlink" href="#parameters.Parameters.save" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em></p>
+<p>save text files containing the nodes, the connectivity and end nodes of the tree.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="parameters.Parameters.save_paraview">
+<code class="descname">save_paraview</code><a class="headerlink" href="#parameters.Parameters.save_paraview" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em></p>
+<p>save a .vtu paraview file. The tvtk module must be installed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="Mesh.html" class="btn btn-neutral" title="Mesh module" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Francisco Sahli.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

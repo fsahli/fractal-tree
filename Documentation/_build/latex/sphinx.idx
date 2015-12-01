@@ -1,0 +1,32 @@
+\indexentry{Branch3D (module)|hyperpage}{3}
+\indexentry{Branch (class in Branch3D)|hyperpage}{3}
+\indexentry{child (Branch3D.Branch attribute)|hyperpage}{3}
+\indexentry{dir (Branch3D.Branch attribute)|hyperpage}{3}
+\indexentry{nodes (Branch3D.Branch attribute)|hyperpage}{3}
+\indexentry{triangles (Branch3D.Branch attribute)|hyperpage}{3}
+\indexentry{tri (Branch3D.Branch attribute)|hyperpage}{3}
+\indexentry{growing (Branch3D.Branch attribute)|hyperpage}{4}
+\indexentry{add\_node\_to\_queue() (Branch3D.Branch method)|hyperpage}{4}
+\indexentry{Nodes (class in Branch3D)|hyperpage}{4}
+\indexentry{nodes (Branch3D.Nodes attribute)|hyperpage}{4}
+\indexentry{last\_node (Branch3D.Nodes attribute)|hyperpage}{4}
+\indexentry{end\_nodes (Branch3D.Nodes attribute)|hyperpage}{4}
+\indexentry{tree (Branch3D.Nodes attribute)|hyperpage}{4}
+\indexentry{collision\_tree (Branch3D.Nodes attribute)|hyperpage}{4}
+\indexentry{add\_nodes() (Branch3D.Nodes method)|hyperpage}{4}
+\indexentry{collision() (Branch3D.Nodes method)|hyperpage}{5}
+\indexentry{distance\_from\_node() (Branch3D.Nodes method)|hyperpage}{5}
+\indexentry{distance\_from\_point() (Branch3D.Nodes method)|hyperpage}{5}
+\indexentry{gradient() (Branch3D.Nodes method)|hyperpage}{5}
+\indexentry{update\_collision\_tree() (Branch3D.Nodes method)|hyperpage}{5}
+\indexentry{mesh (module)|hyperpage}{9}
+\indexentry{Mesh (class in mesh)|hyperpage}{9}
+\indexentry{verts (mesh.Mesh attribute)|hyperpage}{9}
+\indexentry{connectivity (mesh.Mesh attribute)|hyperpage}{9}
+\indexentry{normals (mesh.Mesh attribute)|hyperpage}{9}
+\indexentry{node\_to\_tri (mesh.Mesh attribute)|hyperpage}{9}
+\indexentry{tree (mesh.Mesh attribute)|hyperpage}{9}
+\indexentry{loadOBJ() (mesh.Mesh method)|hyperpage}{9}
+\indexentry{project\_new\_point() (mesh.Mesh method)|hyperpage}{9}
+\indexentry{sphere\_parameters (module)|hyperpage}{11}
+\indexentry{Parameters (class in sphere\_parameters)|hyperpage}{11}

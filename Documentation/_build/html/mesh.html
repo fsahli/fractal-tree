@@ -1,0 +1,295 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Mesh module &mdash; Fractal Tree 0.1.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Fractal Tree 0.1.1 documentation" href="index.html"/>
+        <link rel="next" title="parameters module" href="parameters.html"/>
+        <link rel="prev" title="FractalTree module" href="FractalTree.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Fractal Tree
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Branch3D.html">Branch3D module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="FractalTree.html">FractalTree module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Mesh module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">parameters module</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">Fractal Tree</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Mesh module</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/Mesh.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-Mesh">
+<span id="mesh-module"></span><h1>Mesh module<a class="headerlink" href="#module-Mesh" title="Permalink to this headline">¶</a></h1>
+<p>This module contains the mesh class. This class is the triangular surface where the fractal tree is grown.</p>
+<dl class="class">
+<dt id="Mesh.Mesh">
+<em class="property">class </em><code class="descclassname">Mesh.</code><code class="descname">Mesh</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Mesh.html#Mesh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Mesh.Mesh" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class that contains the mesh where fractal tree is grown. It must be Wavefront .obj file. Be careful on how the normals are defined. It can change where an specified angle will go.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) &#8211; the path and filename of the .obj file with the mesh.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="Mesh.Mesh.verts">
+<code class="descname">verts</code><a class="headerlink" href="#Mesh.Mesh.verts" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>array</em></p>
+<p>a numpy array that contains all the nodes of the mesh. verts[i,j], where i is the node index and j=[0,1,2] is the coordinate (x,y,z).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Mesh.Mesh.connectivity">
+<code class="descname">connectivity</code><a class="headerlink" href="#Mesh.Mesh.connectivity" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>array</em></p>
+<p>a numpy array that contains all the connectivity of the triangles of the mesh. connectivity[i,j], where i is the triangle index and j=[0,1,2] is node index.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Mesh.Mesh.normals">
+<code class="descname">normals</code><a class="headerlink" href="#Mesh.Mesh.normals" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>array</em></p>
+<p>a numpy array that contains all the normals of the triangles of the mesh. normals[i,j], where i is the triangle index and j=[0,1,2] is normal coordinate (x,y,z).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Mesh.Mesh.node_to_tri">
+<code class="descname">node_to_tri</code><a class="headerlink" href="#Mesh.Mesh.node_to_tri" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em></p>
+<p>a dictionary that relates a node to the triangles that it is connected. It is the inverse relation of connectivity. The triangles are stored as a list for each node.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Mesh.Mesh.tree">
+<code class="descname">tree</code><a class="headerlink" href="#Mesh.Mesh.tree" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>scipy.spatial.cKDTree</em></p>
+<p>a k-d tree to compute the distance from any point to the closest node in the mesh.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Mesh.Mesh.loadOBJ">
+<code class="descname">loadOBJ</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Mesh.html#Mesh.loadOBJ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Mesh.Mesh.loadOBJ" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function reads a .obj mesh file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) &#8211; the path and filename of the .obj file.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>verts</strong> &#8211;
+a numpy array that contains all the nodes of the mesh. verts[i,j], where i is the node index and j=[0,1,2] is the coordinate (x,y,z).
+connectivity (array): a numpy array that contains all the connectivity of the triangles of the mesh. connectivity[i,j], where i is the triangle index and j=[0,1,2] is node index.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="Mesh.Mesh.project_new_point">
+<code class="descname">project_new_point</code><span class="sig-paren">(</span><em>point</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Mesh.html#Mesh.project_new_point"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Mesh.Mesh.project_new_point" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function projects any point to the surface defined by the mesh.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>point</strong> (<em>array</em>) &#8211; coordinates of the point to project.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>projected_point</strong> &#8211;
+the coordinates of the projected point that lies in the surface.
+intriangle (int): the index of the triangle where the projected point lies. If the point is outside surface, intriangle=-1.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="parameters.html" class="btn btn-neutral float-right" title="parameters module" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="FractalTree.html" class="btn btn-neutral" title="FractalTree module" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Francisco Sahli.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
