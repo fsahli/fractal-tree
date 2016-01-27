@@ -4,11 +4,11 @@ This code is to create a fractal tree over a surface discretized by triangles. I
 
 Read the documentation in [fractal-tree.readthedocs.org](http://fractal-tree.readthedocs.org/en/latest/). 
 
-The details of the algorithm are presented in this [article](http://biomechanics.stanford.edu/paper/JBIOM16.pdf). If you are going to use this code, please cite:
+The details of the algorithm are presented in this [article](http://www.sciencedirect.com/science/article/pii/S0021929015007332). If you are going to use this code, please cite:
 
 	Generating Purkinje networks in the human heart.
 	F. Sahli Costabal, D. Hurtado and E. Kuhl.
-	Journal of Biomechanics, accepted for publication.
+	Journal of Biomechanics, doi:10.1016/j.jbiomech.2015.12.025
 
 
 **Pre-requisites:**
