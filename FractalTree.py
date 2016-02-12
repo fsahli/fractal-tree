@@ -69,8 +69,8 @@ def Fractal_Tree_3D(param):
     for i in range(param.N_it):
         shuffle(branches_to_grow)
         new_branches_to_grow=[]
-        angle=-param.branch_angle*np.random.choice([-1,1])
         for g in branches_to_grow:
+            angle=-param.branch_angle*np.random.choice([-1,1])
             for j in range(2):
                 brother_nodes=[]
                 brother_nodes+=branches[g].nodes
@@ -80,7 +80,9 @@ def Fractal_Tree_3D(param):
                 #Add new branch
                 last_branch+=1
                 print last_branch
-                l=param.length#+np.random.normal(0,np.sqrt(0.2*param.length))
+                l=param.length+np.random.normal(0,param.std_length)
+                if l<param.min_length:
+                    l=param.min_length
                 branches[last_branch]=Branch(m,branches[g].nodes[-1],branches[g].dir,branches[g].tri,l,angle,param.w,nodes,brother_nodes,int(param.length/param.l_segment))
                 #Add nodes to IEN
                 for i_n in range(len(branches[last_branch].nodes)-1):
@@ -96,18 +98,12 @@ def Fractal_Tree_3D(param):
         
     if param.save:
         if param.save_paraview:
-            from tvtk.api import tvtk
+            from ParaviewWriter import write_line_VTU
             print 'Finished growing, writing paraview file'
-            line_type = tvtk.Line().cell_type
             xyz=np.zeros((len(nodes.nodes),3))
             for i in range(len(nodes.nodes)):
-                xyz[i,:]=nodes.nodes[i]
-            ug = tvtk.UnstructuredGrid(points=xyz)
-            ug.set_cells(line_type, ien)
-            
-            w = tvtk.XMLUnstructuredGridWriter(input = ug, file_name=(param.filename+'.vtu'))
-            
-            w.write()
+                xyz[i,:]=nodes.nodes[i]                    
+            write_line_VTU(xyz, ien, param.filename + '.vtu')                
         
         np.savetxt(param.filename+'_ien.txt',ien,fmt='%d')
         np.savetxt(param.filename+'_xyz.txt',xyz)

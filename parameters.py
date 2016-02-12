@@ -36,6 +36,10 @@ class Parameters():
         self.N_it=10
 #Median length of the branches
         self.length=.3
+#Standard deviation of the length
+        self.std_length = np.sqrt(0.2)*self.length
+#Min length to avoid negative length
+        self.min_length = self.length/10.
         self.branch_angle=0.15
         self.w=0.1
 #Length of the segments (approximately, because the lenght of the branch is random)
