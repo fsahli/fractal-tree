@@ -16,6 +16,8 @@ class Parameters():
         init_length (float): length of the first branch.
         N_it (int): number of generations of branches.
         length (float): average lenght of the branches in the tree.
+        std_length (float): standard deviation of the length. Set to zero to avoid random lengths.
+        min_length (float): minimum length of the branches. To avoid randomly generated negative lengths.
         branch_angle (float): angle with respect to the direction of the previous branch and the new branch.
         w (float): repulsivity parameter.
         l_segment (float): length of the segments that compose one branch (approximately, because the lenght of the branch is random). It can be interpreted as the element length in a finite element mesh.
