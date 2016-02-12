@@ -5,7 +5,6 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>FractalTree &mdash; Fractal Tree 0.1.1 documentation</title>
@@ -15,6 +14,7 @@
   
 
   
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
 
   
   
@@ -34,7 +34,7 @@
         <link rel="up" title="Module code" href="index.html"/> 
 
   
-  <script src="../_static/js/modernizr.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
 
 </head>
 
@@ -44,27 +44,11 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
-
-          
-            <a href="../index.html" class="icon icon-home"> Fractal Tree
-          
-
-          
-          </a>
-
-          
-            
-            
-              <div class="version">
-                0.1
-              </div>
-            
-          
-
-          
+      <div class="wy-side-nav-search">
+        
+          <a href="../index.html" class="fa fa-home"> Fractal Tree</a>
+        
+        
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -72,25 +56,23 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
+      </div>
 
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
           
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
-            
-            
-                <ul>
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="../Branch3D.html">Branch3D module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../FractalTree.html">FractalTree module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../Mesh.html">Mesh module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../parameters.html">parameters module</a></li>
 </ul>
 
-            
           
-        </div>
+        
       </div>
+      &nbsp;
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -105,13 +87,7 @@
       
       <div class="wy-nav-content">
         <div class="rst-content">
-          
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
+          <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="../index.html">Docs</a> &raquo;</li>
       
@@ -120,14 +96,11 @@
     <li>FractalTree</li>
       <li class="wy-breadcrumbs-aside">
         
-          
-        
       </li>
   </ul>
   <hr/>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
+          <div role="main" class="document">
             
   <h1>Source code for FractalTree</h1><div class="highlight"><pre>
 <span class="c"># -*- coding: utf-8 -*-</span>
@@ -201,8 +174,8 @@
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">N_it</span><span class="p">):</span>
         <span class="n">shuffle</span><span class="p">(</span><span class="n">branches_to_grow</span><span class="p">)</span>
         <span class="n">new_branches_to_grow</span><span class="o">=</span><span class="p">[]</span>
-        <span class="n">angle</span><span class="o">=-</span><span class="n">param</span><span class="o">.</span><span class="n">branch_angle</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
         <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">branches_to_grow</span><span class="p">:</span>
+            <span class="n">angle</span><span class="o">=-</span><span class="n">param</span><span class="o">.</span><span class="n">branch_angle</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
                 <span class="n">brother_nodes</span><span class="o">=</span><span class="p">[]</span>
                 <span class="n">brother_nodes</span><span class="o">+=</span><span class="n">branches</span><span class="p">[</span><span class="n">g</span><span class="p">]</span><span class="o">.</span><span class="n">nodes</span>
@@ -212,7 +185,9 @@
                 <span class="c">#Add new branch</span>
                 <span class="n">last_branch</span><span class="o">+=</span><span class="mi">1</span>
                 <span class="k">print</span> <span class="n">last_branch</span>
-                <span class="n">l</span><span class="o">=</span><span class="n">param</span><span class="o">.</span><span class="n">length</span><span class="c">#+np.random.normal(0,np.sqrt(0.2*param.length))</span>
+                <span class="n">l</span><span class="o">=</span><span class="n">param</span><span class="o">.</span><span class="n">length</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">param</span><span class="o">.</span><span class="n">std_length</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">l</span><span class="o">&lt;</span><span class="n">param</span><span class="o">.</span><span class="n">min_length</span><span class="p">:</span>
+                    <span class="n">l</span><span class="o">=</span><span class="n">param</span><span class="o">.</span><span class="n">min_length</span>
                 <span class="n">branches</span><span class="p">[</span><span class="n">last_branch</span><span class="p">]</span><span class="o">=</span><span class="n">Branch</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">branches</span><span class="p">[</span><span class="n">g</span><span class="p">]</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">branches</span><span class="p">[</span><span class="n">g</span><span class="p">]</span><span class="o">.</span><span class="n">dir</span><span class="p">,</span><span class="n">branches</span><span class="p">[</span><span class="n">g</span><span class="p">]</span><span class="o">.</span><span class="n">tri</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">angle</span><span class="p">,</span><span class="n">param</span><span class="o">.</span><span class="n">w</span><span class="p">,</span><span class="n">nodes</span><span class="p">,</span><span class="n">brother_nodes</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">length</span><span class="o">/</span><span class="n">param</span><span class="o">.</span><span class="n">l_segment</span><span class="p">))</span>
                 <span class="c">#Add nodes to IEN</span>
                 <span class="k">for</span> <span class="n">i_n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">branches</span><span class="p">[</span><span class="n">last_branch</span><span class="p">]</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
@@ -228,30 +203,21 @@
         
     <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">save</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">save_paraview</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">tvtk.api</span> <span class="kn">import</span> <span class="n">tvtk</span>
+            <span class="kn">from</span> <span class="nn">ParaviewWriter</span> <span class="kn">import</span> <span class="n">write_line_VTU</span>
             <span class="k">print</span> <span class="s">&#39;Finished growing, writing paraview file&#39;</span>
-            <span class="n">line_type</span> <span class="o">=</span> <span class="n">tvtk</span><span class="o">.</span><span class="n">Line</span><span class="p">()</span><span class="o">.</span><span class="n">cell_type</span>
             <span class="n">xyz</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">nodes</span><span class="p">),</span><span class="mi">3</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">nodes</span><span class="p">)):</span>
-                <span class="n">xyz</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span><span class="o">=</span><span class="n">nodes</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="n">ug</span> <span class="o">=</span> <span class="n">tvtk</span><span class="o">.</span><span class="n">UnstructuredGrid</span><span class="p">(</span><span class="n">points</span><span class="o">=</span><span class="n">xyz</span><span class="p">)</span>
-            <span class="n">ug</span><span class="o">.</span><span class="n">set_cells</span><span class="p">(</span><span class="n">line_type</span><span class="p">,</span> <span class="n">ien</span><span class="p">)</span>
-            
-            <span class="n">w</span> <span class="o">=</span> <span class="n">tvtk</span><span class="o">.</span><span class="n">XMLUnstructuredGridWriter</span><span class="p">(</span><span class="nb">input</span> <span class="o">=</span> <span class="n">ug</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">filename</span><span class="o">+</span><span class="s">&#39;.vtu&#39;</span><span class="p">))</span>
-            
-            <span class="n">w</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+                <span class="n">xyz</span><span class="p">[</span><span class="n">i</span><span class="p">,:]</span><span class="o">=</span><span class="n">nodes</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>                    
+            <span class="n">write_line_VTU</span><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="n">ien</span><span class="p">,</span> <span class="n">param</span><span class="o">.</span><span class="n">filename</span> <span class="o">+</span> <span class="s">&#39;.vtu&#39;</span><span class="p">)</span>                
         
         <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">filename</span><span class="o">+</span><span class="s">&#39;_ien.txt&#39;</span><span class="p">,</span><span class="n">ien</span><span class="p">,</span><span class="n">fmt</span><span class="o">=</span><span class="s">&#39;</span><span class="si">%d</span><span class="s">&#39;</span><span class="p">)</span>
         <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">filename</span><span class="o">+</span><span class="s">&#39;_xyz.txt&#39;</span><span class="p">,</span><span class="n">xyz</span><span class="p">)</span>
         <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">filename</span><span class="o">+</span><span class="s">&#39;_endnodes.txt&#39;</span><span class="p">,</span><span class="n">nodes</span><span class="o">.</span><span class="n">end_nodes</span><span class="p">,</span><span class="n">fmt</span><span class="o">=</span><span class="s">&#39;</span><span class="si">%d</span><span class="s">&#39;</span><span class="p">)</span>
         
 
-    <span class="k">return</span> <span class="n">branches</span><span class="p">,</span><span class="n">nodes</span></div>
+    <span class="k">return</span> <span class="n">branches</span><span class="p">,</span><span class="n">nodes</span>
+</pre></div></div>
 
-
-</pre></div>
-
-           </div>
           </div>
           <footer>
   
@@ -261,13 +227,12 @@
   <div role="contentinfo">
     <p>
         &copy; Copyright 2015, Francisco Sahli.
-
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
 </footer>
-
         </div>
       </div>
 

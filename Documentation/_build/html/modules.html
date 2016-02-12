@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to Fractal-Tree’s documentation! &mdash; Fractal Tree 0.1.1 documentation</title>
+  <title>. &mdash; Fractal Tree 0.1.1 documentation</title>
   
 
   
@@ -30,8 +30,7 @@
   
 
   
-    <link rel="top" title="Fractal Tree 0.1.1 documentation" href="#"/>
-        <link rel="next" title="Branch3D module" href="Branch3D.html"/> 
+    <link rel="top" title="Fractal Tree 0.1.1 documentation" href="index.html"/> 
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
@@ -46,7 +45,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-nav-search">
         
-          <a href="#" class="fa fa-home"> Fractal Tree</a>
+          <a href="index.html" class="fa fa-home"> Fractal Tree</a>
         
         
 <div role="search">
@@ -80,7 +79,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="#">Fractal Tree</a>
+        <a href="index.html">Fractal Tree</a>
       </nav>
 
 
@@ -89,12 +88,12 @@
         <div class="rst-content">
           <div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="#">Docs</a> &raquo;</li>
+    <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>Welcome to Fractal-Tree&#8217;s documentation!</li>
+    <li>.</li>
       <li class="wy-breadcrumbs-aside">
         
-          <a href="_sources/index.txt" rel="nofollow"> View page source</a>
+          <a href="_sources/modules.txt" rel="nofollow"> View page source</a>
         
       </li>
   </ul>
@@ -102,62 +101,23 @@
 </div>
           <div role="main" class="document">
             
-  <div class="section" id="welcome-to-fractal-tree-s-documentation">
-<h1>Welcome to Fractal-Tree&#8217;s documentation!<a class="headerlink" href="#welcome-to-fractal-tree-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>This code is to create a fractal tree over a surface discretized by triangles. It was developed to create a representation of the Purkinje network in the ventricles of the human heart.</p>
-<p>The details of the algorithm are presented in this <a class="reference external" href="hhttp://biomechanics.stanford.edu/paper/JBIOM16.pdf">article</a>. If you are going to use this code, please cite:</p>
-<div class="line-block">
-<div class="line">Generating Purkinje networks in the human heart.</div>
-<div class="line">F. Sahli Costabal, D. Hurtado and E. Kuhl.</div>
-<div class="line">Journal of Biomechanics, accepted for publication.</div>
-<div class="line"><br /></div>
-</div>
-<p><strong>Pre-requisites:</strong></p>
-<ul class="simple">
-<li>Numpy</li>
-<li>Scipy</li>
-<li>Mayavi, if you want to export Paraview files for visualization.</li>
-</ul>
-<p>You will need .obj mesh file to create the tree. A very nice software to manipulate the mesh and export it to .obj is <a class="reference external" href="http://meshlab.sourceforge.net">MeshLab</a>. Please check if the mesh has duplicated vertex or faces before running the code. Also the orientation of the normals can change your results, because the angles will be fliped. To visualize the output, the best alternative is <a class="reference external" href="http://www.paraview.org">Paraview</a>.</p>
-<p>To define the mesh file and the parameters of the tree to use, edit the parameters.py file and then run:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">FractalTree</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">parameters</span> <span class="kn">import</span> <span class="n">Parameters</span>
-
-<span class="n">param</span><span class="o">=</span><span class="n">Parameters</span><span class="p">()</span>
-
-<span class="n">branches</span><span class="p">,</span> <span class="n">nodes</span> <span class="o">=</span> <span class="n">Fractal_Tree_3D</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>If you have questions you can contact me at francisco.sahli  at  gmail.com</p>
-<p>Contents:</p>
+  <div class="section" id="id1">
+<h1>.<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="Branch3D.html">Branch3D module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="FractalTree.html">FractalTree module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Mesh.html">Mesh module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ParaviewWriter.html">ParaviewWriter module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="create_fractal_tree.html">create_fractal_tree module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="parameters.html">parameters module</a></li>
 </ul>
 </div>
-</div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span>Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span>Module Index</span></a></li>
-<li><a class="reference internal" href="search.html"><span>Search Page</span></a></li>
-</ul>
 </div>
 
 
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="Branch3D.html" class="btn btn-neutral float-right" title="Branch3D module">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-    </div>
   
 
   <hr/>

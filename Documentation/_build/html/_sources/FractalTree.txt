@@ -1,5 +1,5 @@
 FractalTree module
-======================
+==================
 
 .. automodule:: FractalTree
     :members:
