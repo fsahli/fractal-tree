@@ -8,7 +8,9 @@ Welcome to Fractal-Tree's documentation!
 
 This code is to create a fractal tree over a surface discretized by triangles. It was developed to create a representation of the Purkinje network in the ventricles of the human heart. 
 
-The details of the algorithm are presented in this `article <http://biomechanics.stanford.edu/paper/JBIOM16.pdf>`_. If you are going to use this code, please cite:
+
+The details of the algorithm are presented in this `article <https://www.sciencedirect.com/science/article/pii/S0021929015007332>`_. If you are going to use this code, please cite:
+
 
 |	Generating Purkinje networks in the human heart.
 |	F. Sahli Costabal, D. Hurtado and E. Kuhl.
