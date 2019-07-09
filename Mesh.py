@@ -87,6 +87,8 @@ class Mesh:
         #print d, node
         #Get triangles connected to that node
         triangles=self.node_to_tri[node]
+        if len(triangles) == 0:
+            raise Exception('node not connected to triangles, check your mesh')
         #print triangles
         #Compute the vertex normal as the avergage of the triangle normals.
         vertex_normal=np.sum(self.normals[triangles],axis=0)
@@ -99,7 +101,6 @@ class Mesh:
         for tri in triangles:
             CPP.append(np.dot(pre_projected_point-self.verts[self.connectivity[tri,0],:],self.normals[tri,:]))
         CPP=np.array(CPP)
-     #   print 'CPP=',CPP
         triangles=np.array(triangles)
         #Sort from closest to furthest
         order=np.abs(CPP).argsort()
