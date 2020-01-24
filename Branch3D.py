@@ -5,13 +5,12 @@ This module contains the Branch class (one branch of the tree)  and the Nodes cl
 
 import numpy as np
 from multiprocessing.dummy import Pool as ThreadPool
-from operator import itemgetter
 from scipy.spatial import cKDTree
 
 pool = ThreadPool(16) 
 
 class Branch:
-    """Class that contains a branch of the fractal tree.
+    """Class that contains a branch of the fractal tree
     
     
     Args:    
@@ -64,13 +63,13 @@ class Branch:
             intriangle=self.add_node_to_queue(mesh,self.queue[i-1],dir*l/Nsegments)
             #print 'intriangle',intriangle
             if not intriangle:
-                print 'Point not in triangle',i
+                print('Point not in triangle',i)
 #                print self.queue[i-1]+dir*l/50.
                 self.growing=False
                 break
             collision=nodes.collision(self.queue[i])
             if collision[1]<l/5.:
-                print "Collision",i, collision
+                print("Collision",i, collision)
                 self.growing=False
                 self.queue.pop()
                 self.triangles.pop()
@@ -193,7 +192,7 @@ class Nodes:
         if len(nodes_to_consider)==0:
             nodes_to_consider=[np.array([-100000000000.0,-100000000000.0,-100000000000.0])]
             self.nodes_to_consider_keys=[100000000]
-            print "no nodes to consider"
+            print("no nodes to consider")
         self.collision_tree=cKDTree(nodes_to_consider)
     def collision(self,point):
         """This function returns the distance between one point and the closest node in the tree and the index of the closest node using the collision_tree.

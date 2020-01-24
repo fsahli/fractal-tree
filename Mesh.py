@@ -54,10 +54,10 @@ class Mesh:
             vals = line.split()
             if len(vals)>0:
                 if vals[0] == "v":  
-                    v = map(float, vals[1:4])  
+                    v = list(map(float, vals[1:4]))
                     verts.append(v)  
                 if vals[0] == "vn":  
-                    n = map(float, vals[1:4])  
+                    n = list(map(float, vals[1:4]))
                     norms.append(n)  
                 if vals[0] == "f": 
                     con=[]

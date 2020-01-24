@@ -37,7 +37,7 @@ def Fractal_Tree_3D(param):
     if tri>=0:
         init_tri=tri
     else:
-        print 'initial point not in mesh'
+        print('initial point not in mesh')
         sys.exit(0)
     #Initialize the dictionary that stores the branches objects
     branches={}
@@ -63,7 +63,7 @@ def Fractal_Tree_3D(param):
             
             for i_n in range(len(branches[last_branch].nodes)-1):
                 ien.append([branches[last_branch].nodes[i_n],branches[last_branch].nodes[i_n+1]])                 
-        branches_to_grow=range(1,len(param.fascicles_angles)+1)
+        branches_to_grow=list(range(1,len(param.fascicles_angles)+1))
 
         
     for i in range(param.N_it):
@@ -79,7 +79,7 @@ def Fractal_Tree_3D(param):
                 
                 #Add new branch
                 last_branch+=1
-                print last_branch
+                print(last_branch)
                 l=param.length+np.random.normal(0,param.std_length)
                 if l<param.min_length:
                     l=param.min_length
@@ -99,7 +99,7 @@ def Fractal_Tree_3D(param):
     if param.save:
         if param.save_paraview:
             from ParaviewWriter import write_line_VTU
-            print 'Finished growing, writing paraview file'
+            print('Finished growing, writing paraview file')
             xyz=np.zeros((len(nodes.nodes),3))
             for i in range(len(nodes.nodes)):
                 xyz[i,:]=nodes.nodes[i]                    

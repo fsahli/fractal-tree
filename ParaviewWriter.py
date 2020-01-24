@@ -24,9 +24,7 @@ def write_line_VTU(nodes,elements,filename):
 	DAp.set('NumberOfComponents','3')
 	DAp.set('Format','ascii')
 	DAp.text=''
-	print "node string start"
 	DAp.text='\n'.join(map(lambda a: str(a[0])+' '+str(a[1])+' '+str(a[2]), nodes))
-	print 'node string end'
 #	DApd.text='\n'.join(map(str,NT11.values()))
 	cell=ET.SubElement(piece,'Cells')
 	DAc=ET.SubElement(cell,'DataArray')

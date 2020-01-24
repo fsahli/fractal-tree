@@ -33,11 +33,11 @@ class Parameters():
         self.filename='sphere-line'
         self.init_node=np.array([-1.0 ,0., 0.])
         self.second_node=np.array([-0.964,  0.00,  0.266      ])
-        self.init_length=0.5
+        self.init_length=0.1
 #Number of iterations (generations of branches)
         self.N_it=10
 #Median length of the branches
-        self.length=.3
+        self.length=.1
 #Standard deviation of the length
         self.std_length = np.sqrt(0.2)*self.length
 #Min length to avoid negative length
