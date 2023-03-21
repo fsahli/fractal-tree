@@ -25,6 +25,10 @@ dev = [
     "bump2version",
     "pre-commit",
 ]
+pypi = [
+    "twine",
+    "build"
+]
 docs = [
    "jupyter-book",
    "sphinx-autoapi"
@@ -32,6 +36,7 @@ docs = [
 all = [
    "fractal_tree[test]",
    "fractal_tree[docs]",
+   "fractal_tree[pypi]",
    "fractal_tree[dev]"
 ]
 
