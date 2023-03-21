@@ -44,7 +44,6 @@ class Branch:
 #        self.normal=np.array([0.0,0.0,0.0])
         self.queue=[]
         self.growing=True
-        shared_node=-1
         init_normal=mesh.normals[init_tri]
         nodes.update_collision_tree(brother_nodes)
 #        global_nnodes=len(nodes.nodes)
@@ -73,7 +72,7 @@ class Branch:
                 self.growing=False
                 self.queue.pop()
                 self.triangles.pop()
-                shared_node=collision[0]
+                collision[0]
                 break
             grad=nodes.gradient(self.queue[i])
             normal=mesh.normals[self.triangles[i],:]
