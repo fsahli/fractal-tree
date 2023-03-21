@@ -16,6 +16,37 @@ from .Mesh import Mesh
 logger = logging.getLogger(__name__)
 
 
+def grow_fascicles(branches, param, mesh, nodes, ien, last_branch):
+    brother_nodes = []
+    brother_nodes += branches[0].nodes
+    for i_branch in range(len(param.fascicles_angles)):
+        last_branch += 1
+        angle = param.fascicles_angles[i_branch]
+        branches[last_branch] = Branch(
+            mesh,
+            branches[0].nodes[-1],
+            branches[0].dir,
+            branches[0].tri,
+            param.fascicles_length[i_branch],
+            angle,
+            0.0,
+            nodes,
+            brother_nodes,
+            int(param.fascicles_length[i_branch] / param.l_segment),
+        )
+        brother_nodes += branches[last_branch].nodes
+
+        for i_n in range(len(branches[last_branch].nodes) - 1):
+            ien.append(
+                [
+                    branches[last_branch].nodes[i_n],
+                    branches[last_branch].nodes[i_n + 1],
+                ]
+            )
+    branches_to_grow = list(range(1, len(param.fascicles_angles) + 1))
+    return branches_to_grow, last_branch
+
+
 def Fractal_Tree_3D(param):
     """This function creates the fractal tree.
     Args:
@@ -30,7 +61,7 @@ def Fractal_Tree_3D(param):
             the object that contains all the nodes of the tree.
     """
     # Read Mesh
-    m = Mesh(param.meshfile)
+    mesh = Mesh(param.meshfile)
     # Define the initial direction
     init_dir = (param.second_node - param.init_node) / np.linalg.norm(
         param.second_node - param.init_node
@@ -39,7 +70,7 @@ def Fractal_Tree_3D(param):
     # Initialize the nodes object, contains the nodes and all the distance functions
     nodes = Nodes(param.init_node)
     # Project the first node to the mesh.
-    point, tri = m.project_new_point(nodes.nodes[0])
+    point, tri = mesh.project_new_point(nodes.nodes[0])
     if tri >= 0:
         init_tri = tri
     else:
@@ -50,7 +81,7 @@ def Fractal_Tree_3D(param):
     last_branch = 0
     # Compute the first branch
     branches[last_branch] = Branch(
-        m,
+        mesh,
         0,
         init_dir,
         init_tri,
@@ -71,33 +102,9 @@ def Fractal_Tree_3D(param):
         )
     # To grow fascicles
     if param.Fascicles:
-        brother_nodes = []
-        brother_nodes += branches[0].nodes
-        for i_branch in range(len(param.fascicles_angles)):
-            last_branch += 1
-            angle = param.fascicles_angles[i_branch]
-            branches[last_branch] = Branch(
-                m,
-                branches[0].nodes[-1],
-                branches[0].dir,
-                branches[0].tri,
-                param.fascicles_length[i_branch],
-                angle,
-                0.0,
-                nodes,
-                brother_nodes,
-                int(param.fascicles_length[i_branch] / param.l_segment),
-            )
-            brother_nodes += branches[last_branch].nodes
-
-            for i_n in range(len(branches[last_branch].nodes) - 1):
-                ien.append(
-                    [
-                        branches[last_branch].nodes[i_n],
-                        branches[last_branch].nodes[i_n + 1],
-                    ]
-                )
-        branches_to_grow = list(range(1, len(param.fascicles_angles) + 1))
+        branches_to_grow, last_branch = grow_fascicles(
+            branches, param, mesh, nodes, ien, last_branch
+        )
 
     for i in range(param.N_it):
         choices = 2 * np.random.randint(2, size=len(branches_to_grow)) - 1
@@ -123,7 +130,7 @@ def Fractal_Tree_3D(param):
                 if l < param.min_length:
                     l = param.min_length
                 branches[last_branch] = Branch(
-                    m,
+                    mesh,
                     branches[g].nodes[-1],
                     branches[g].dir,
                     branches[g].tri,
