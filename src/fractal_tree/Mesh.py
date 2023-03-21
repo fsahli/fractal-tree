@@ -9,6 +9,21 @@ import collections
 import meshio
 
 
+def closest_point_projection(
+    triangles, pre_projected_point, verts, connectivity, normals
+):
+    CPP = []
+    for tri in triangles:
+        CPP.append(
+            np.dot(
+                pre_projected_point - verts[connectivity[tri, 0], :],
+                normals[tri, :],
+            )
+        )
+
+    return np.array(CPP)
+
+
 class Mesh:
     """Class that contains the mesh where fractal tree is grown.
     It must be Wavefront .obj file. Be careful on how the normals
@@ -98,15 +113,9 @@ class Mesh:
             point - self.verts[node], vertex_normal
         )
         # Calculate the distance from point to plane (Closest point projection)
-        CPP = []
-        for tri in triangles:
-            CPP.append(
-                np.dot(
-                    pre_projected_point - self.verts[self.connectivity[tri, 0], :],
-                    self.normals[tri, :],
-                )
-            )
-        CPP = np.array(CPP)
+        CPP = closest_point_projection(
+            triangles, pre_projected_point, self.verts, self.connectivity, self.normals
+        )
         triangles = np.array(triangles)
         # Sort from closest to furthest
         order = np.abs(CPP).argsort()
