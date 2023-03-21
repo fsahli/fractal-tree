@@ -96,7 +96,7 @@ class Mesh:
                     con = []
                     for f in vals[1:]:
                         w = f.split("/")
-                        #                      print w
+
                         # OBJ Files are 1-indexed so we must subtract 1 below
                         con.append(int(w[0]) - 1)
                         numVerts += 1
@@ -120,12 +120,12 @@ class Mesh:
         """
         # Get the closest point
         d, node = self.tree.query(point)
-        # print d, node
+
         # Get triangles connected to that node
         triangles = self.node_to_tri[node]
         if len(triangles) == 0:
             raise Exception("node not connected to triangles, check your mesh")
-        # print triangles
+
         # Compute the vertex normal as the avergage of the triangle normals.
         vertex_normal = np.sum(self.normals[triangles], axis=0)
         # Normalize
@@ -147,14 +147,14 @@ class Mesh:
         triangles = np.array(triangles)
         # Sort from closest to furthest
         order = np.abs(CPP).argsort()
-        # print CPP[order]
+
         # Check if point is in triangle
         intriangle = -1
         for o in order:
             i = triangles[o]
-            #      print i
+
             projected_point = pre_projected_point - CPP[o] * self.normals[i, :]
-            #      print projected_point
+
             u = (
                 self.verts[self.connectivity[i, 1], :]
                 - self.verts[self.connectivity[i, 0], :]
@@ -164,19 +164,19 @@ class Mesh:
                 - self.verts[self.connectivity[i, 0], :]
             )
             w = projected_point - self.verts[self.connectivity[i, 0], :]
-            #     print 'check ortogonality',np.dot(w,self.normals[i,:])
+
             vxw = np.cross(v, w)
             vxu = np.cross(v, u)
             uxw = np.cross(u, w)
             sign_r = np.dot(vxw, vxu)
             sign_t = np.dot(uxw, -vxu)
-            #    print sign_r,sign_t
+
             if sign_r >= 0 and sign_t >= 0:
                 r = np.linalg.norm(vxw) / np.linalg.norm(vxu)
                 t = np.linalg.norm(uxw) / np.linalg.norm(vxu)
-                #   print 'sign ok', r , t
+
                 if r <= 1 and t <= 1 and (r + t) <= 1.001:
-                    #      print 'in triangle',i
+
                     intriangle = i
                     break
         return projected_point, intriangle

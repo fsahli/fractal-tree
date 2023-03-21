@@ -1,0 +1,39 @@
+# Book settings
+# Learn more at https://jupyterbook.org/customize/config.html
+
+title: fractal-tree
+author: Francisco Sahli Costabal, Henrik Finsberg
+copyright: "2023"
+only_build_toc_files: true
+
+
+# Information about where the book exists on the web
+repository:
+  url: https://github.com/finsberg/fractal-tree # Online location of your book
+  branch: main
+
+
+html:
+  use_issues_button: true
+  use_repository_button: true
+
+parse:
+  myst_enable_extensions:
+    - amsmath
+    - dollarmath
+    - linkify
+
+sphinx:
+
+  config:
+    html_last_updated_fmt: "%b %d, %Y"
+    autoapi_dirs: ['src/fractal_tree']
+    # Ref: https://github.com/executablebooks/sphinx-external-toc/issues/36
+    suppress_warnings: ["etoc.toctree"]
+
+  extra_extensions:
+  - 'sphinx.ext.autodoc'
+  - 'sphinx.ext.napoleon'
+  - 'sphinx.ext.viewcode'
+  - 'sphinx.ext.autosummary'
+  - 'autoapi.extension'

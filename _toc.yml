@@ -1,0 +1,11 @@
+format: jb-book
+root: README
+
+parts:
+  - caption: Getting started
+    chapters:
+    - file: docs/install
+  - caption: API documentation
+    chapters:
+    - file: CONTRIBUTING
+    - file: "docs/api.rst"

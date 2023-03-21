@@ -2,7 +2,7 @@
 requires = ["setuptools>=61.0.0", "wheel"]
 
 [project]
-name = "fractal_tree"
+name = "fractal-tree"
 version = "0.1.0"
 description = "Create a fractal tree over a surface discretized by triangles"
 authors = [{name = "Francisco Sahli Costabal" },{name = "Henrik Finsberg", email = "henriknf@simula.no"}]
@@ -26,9 +26,7 @@ dev = [
 ]
 docs = [
    "jupyter-book",
-   "jupytext",
-   "plotly",
-   "ipython<8.7.0"
+   "sphinx-autoapi"
 ]
 all = [
    "fractal_tree[test]",
@@ -36,15 +34,15 @@ all = [
    "fractal_tree[dev]"
 ]
 
+[tool.setuptools]
+license-files = ["LICENSE_fsahli"]
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
-[tool.setuptools.package-data]
-fractal_tree = ["drug_factors.json"]
 
 [tool.pytest.ini_options]
 addopts = [
-   "--import-mode=importlib",
    "--cov=fractal_tree",
    "--cov-report=html",
    "--cov-report=term-missing",

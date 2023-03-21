@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-This module contains the Branch class (one branch of the tree)  and the Nodes class
+This module contains the Branch class (one branch of the tree)  and the Nodes cl__name__ass
 """
 
 import numpy as np
-from multiprocessing.dummy import Pool as ThreadPool
+import logging
 from scipy.spatial import cKDTree
 
-pool = ThreadPool(16)
+logger = logging.getLogger(__name__)
 
 
 class Branch:
@@ -93,20 +93,19 @@ class Branch:
         self.triangles.append(init_tri)
         grad = nodes.gradient(self.queue[0])
         dir = (dir + w * grad) / np.linalg.norm(dir + w * grad)
-        #    print nodes.nodes[init_node]+dir*l/Nsegments
+
         for i in range(1, Nsegments):
             intriangle = self.add_node_to_queue(
                 mesh, self.queue[i - 1], dir * l / Nsegments
             )
-            # print 'intriangle',intriangle
+
             if not intriangle:
-                print("Point not in triangle", i)
-                #                print self.queue[i-1]+dir*l/50.
+                logger.info(f"Point {i} not in triangle")
                 self.growing = False
                 break
             collision = nodes.collision(self.queue[i])
             if collision[1] < l / 5.0:
-                print("Collision", i, collision)
+                logger.debug(f"Collision {i}: {collision}")
                 self.growing = False
                 self.queue.pop()
                 self.triangles.pop()
@@ -122,7 +121,7 @@ class Branch:
         if not self.growing:
             nodes.end_nodes.append(self.nodes[-1])
         self.dir = dir
-        # #print self.triangles
+
         self.tri = self.triangles[-1]
 
     # Uncomment the following lines for a closed network
@@ -148,17 +147,15 @@ class Branch:
                 true if the new node is in the triangle.
 
         """
-        # print 'node trying to project', init_node+dir
         point, triangle = mesh.project_new_point(init_node + dir)
-        # print 'Projected point', point, 'dist', np.linalg.norm(point-init_node)
+
         if triangle >= 0:
             self.queue.append(point)
             self.triangles.append(triangle)
             success = True
         else:
-            #            print point, triangle
             success = False
-        # print 'Success? ',success
+
         return success
 
 
@@ -269,7 +266,7 @@ class Nodes:
                 np.array([-100000000000.0, -100000000000.0, -100000000000.0])
             ]
             self.nodes_to_consider_keys = [100000000]
-            print("no nodes to consider")
+            logger.info("no nodes to consider")
         self.collision_tree = cKDTree(nodes_to_consider)
 
     def collision(self, point):

@@ -6,10 +6,13 @@ This module contains the function that creates the fractal tree.
 
 import sys
 import numpy as np
+import logging
 from random import shuffle
 
 from .Branch3D import Nodes, Branch
 from .Mesh import Mesh
+
+logger = logging.getLogger(__name__)
 
 
 def Fractal_Tree_3D(param):
@@ -39,7 +42,7 @@ def Fractal_Tree_3D(param):
     if tri >= 0:
         init_tri = tri
     else:
-        print("initial point not in mesh")
+        logger.error("initial point not in mesh")
         sys.exit(0)
     # Initialize the dictionary that stores the branches objects
     branches = {}
@@ -108,7 +111,7 @@ def Fractal_Tree_3D(param):
 
                 # Add new branch
                 last_branch += 1
-                print(last_branch)
+                logger.debug(last_branch)
                 l = param.length + np.random.normal(0, param.std_length)
                 if l < param.min_length:
                     l = param.min_length
@@ -145,7 +148,7 @@ def Fractal_Tree_3D(param):
         if param.save_paraview:
             from .ParaviewWriter import write_line_VTU
 
-            print("Finished growing, writing paraview file")
+            logger.info("Finished growing, writing paraview file")
             xyz = np.zeros((len(nodes.nodes), 3))
             for i in range(len(nodes.nodes)):
                 xyz[i, :] = nodes.nodes[i]
