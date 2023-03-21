@@ -2,7 +2,7 @@
 
 This code is to create a fractal tree over a surface discretized by triangles. It was developed to create a representation of the Purkinje network in the ventricles of the human heart.
 
-Read the documentation in [fractal-tree.readthedocs.org](http://fractal-tree.readthedocs.org/en/latest/). 
+Read the documentation in [fractal-tree.readthedocs.org](http://fractal-tree.readthedocs.org/en/latest/).
 
 The details of the algorithm are presented in this [article](http://www.sciencedirect.com/science/article/pii/S0021929015007332). If you are going to use this code, please cite:
 
