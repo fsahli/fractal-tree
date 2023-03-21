@@ -7,10 +7,10 @@ This module contains the function that creates the fractal tree.
 
 import sys
 import numpy as np
- #   from PlaneParameters import * #Network properties.
-from Branch3D import *
 from random import shuffle
-from Mesh import Mesh
+
+from .Branch3D import *
+from .Mesh import Mesh
 
 
 
@@ -98,7 +98,7 @@ def Fractal_Tree_3D(param):
         
     if param.save:
         if param.save_paraview:
-            from ParaviewWriter import write_line_VTU
+            from .ParaviewWriter import write_line_VTU
             print('Finished growing, writing paraview file')
             xyz=np.zeros((len(nodes.nodes),3))
             for i in range(len(nodes.nodes)):
