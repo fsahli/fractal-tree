@@ -3,7 +3,8 @@ from pathlib import Path
 import pytest
 
 
-from fractal_tree.FractalTree import Fractal_Tree_3D
+from fractal_tree.tree import FractalTree3D
+from fractal_tree.mesh import Mesh
 from fractal_tree.parameters import Parameters
 
 
@@ -25,8 +26,11 @@ def test_integration(filename):
     param.meshfile = here / ".." / "examples" / "sphere.obj"
     param.filename = filename
 
+    # Read Mesh
+    mesh = Mesh(param.meshfile)
+
     np.random.seed(1234)
-    branches, nodes = Fractal_Tree_3D(param)
+    branches, nodes = FractalTree3D(mesh, param)
 
     assert len(branches) == 893
     assert len(nodes.nodes) == 5822
