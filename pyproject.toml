@@ -10,7 +10,8 @@ license = {file = "LICENSE"}
 readme = "README.md"
 dependencies = [
     "numpy",
-    "scipy"
+    "scipy",
+    "meshio"
 ]
 
 [project.optional-dependencies]

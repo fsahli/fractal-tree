@@ -6,6 +6,7 @@ triangular surface where the fractal tree is grown.
 import numpy as np
 from scipy.spatial import cKDTree
 import collections
+import meshio
 
 
 class Mesh:
@@ -42,7 +43,9 @@ class Mesh:
     """
 
     def __init__(self, filename):
-        verts, connectivity = self.loadOBJ(filename)
+        msh = meshio.read(filename)
+        verts = msh.points
+        connectivity = msh.cells[0].data
         self.verts = np.array(verts)
         self.connectivity = np.array(connectivity)
         self.normals = np.zeros(self.connectivity.shape)
@@ -60,48 +63,8 @@ class Mesh:
             )
             n = np.cross(u, v)
             self.normals[i, :] = n / np.linalg.norm(n)
+
         self.tree = cKDTree(verts)
-
-    def loadOBJ(self, filename):
-        """This function reads a .obj mesh file
-
-        Args:
-            filename (str):
-                the path and filename of the .obj file.
-
-        Returns:
-            verts (array):
-                a numpy array that contains all the nodes
-                of the mesh. verts[i,j], where i is the node
-                index and j=[0,1,2] is the coordinate (x,y,z).
-            connectivity (array):
-                a numpy array that contains all the connectivity
-                of the triangles of the mesh. connectivity[i,j],
-                where i is the triangle index and j=[0,1,2] is node index.
-        """
-        numVerts = 0
-        verts = []
-        norms = []
-        connectivity = []
-        for line in open(filename, "r"):
-            vals = line.split()
-            if len(vals) > 0:
-                if vals[0] == "v":
-                    v = list(map(float, vals[1:4]))
-                    verts.append(v)
-                if vals[0] == "vn":
-                    n = list(map(float, vals[1:4]))
-                    norms.append(n)
-                if vals[0] == "f":
-                    con = []
-                    for f in vals[1:]:
-                        w = f.split("/")
-
-                        # OBJ Files are 1-indexed so we must subtract 1 below
-                        con.append(int(w[0]) - 1)
-                        numVerts += 1
-                    connectivity.append(con)
-        return verts, connectivity
 
     def project_new_point(self, point):
         """This function projects any point to

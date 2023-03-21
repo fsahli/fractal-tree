@@ -10,5 +10,4 @@ from fractal_tree.parameters import Parameters
 
 logging.basicConfig(level=logging.INFO)
 param = Parameters()
-
 branches, nodes = Fractal_Tree_3D(param)

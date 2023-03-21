@@ -7,7 +7,8 @@ This module contains the function that creates the fractal tree.
 import sys
 import numpy as np
 import logging
-from random import shuffle
+
+# from random import shuffle
 
 from .Branch3D import Nodes, Branch
 from .Mesh import Mesh
@@ -99,10 +100,15 @@ def Fractal_Tree_3D(param):
         branches_to_grow = list(range(1, len(param.fascicles_angles) + 1))
 
     for i in range(param.N_it):
-        shuffle(branches_to_grow)
+        choices = 2 * np.random.randint(2, size=len(branches_to_grow)) - 1
+        lengths = np.random.normal(0, param.std_length, size=2 * len(branches_to_grow))
+        k = 0
+        k1 = 0
+        np.random.shuffle(branches_to_grow)
         new_branches_to_grow = []
         for g in branches_to_grow:
-            angle = -param.branch_angle * np.random.choice([-1, 1])
+            angle = -param.branch_angle * choices[k]
+            k += 1
             for j in range(2):
                 brother_nodes = []
                 brother_nodes += branches[g].nodes
@@ -112,7 +118,8 @@ def Fractal_Tree_3D(param):
                 # Add new branch
                 last_branch += 1
                 logger.debug(last_branch)
-                l = param.length + np.random.normal(0, param.std_length)
+                l = param.length + lengths[k1]
+                k1 += 1
                 if l < param.min_length:
                     l = param.min_length
                 branches[last_branch] = Branch(
