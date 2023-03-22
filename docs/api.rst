@@ -8,20 +8,20 @@ Testing more verbose documentation.
    :toctree: _autosummary
    :recursive:
 
-   fractal_tree.Branch3D
+   fractal_tree.branch
 
 
 .. autosummary::
    :toctree: _autosummary
    :recursive:
 
-   fractal_tree.FractalTree
+   fractal_tree.tree
 
 .. autosummary::
    :toctree: _autosummary
    :recursive:
 
-   fractal_tree.Mesh
+   fractal_tree.mesh
 
 .. autosummary::
    :toctree: _autosummary
@@ -33,4 +33,4 @@ Testing more verbose documentation.
    :toctree: _autosummary
    :recursive:
 
-   fractal_tree.ParaviewWriter
+   fractal_tree.viz

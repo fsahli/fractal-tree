@@ -33,7 +33,6 @@ sphinx:
 
   extra_extensions:
   - 'sphinx.ext.autodoc'
-  - 'sphinx.ext.napoleon'
   - 'sphinx.ext.viewcode'
   - 'sphinx.ext.autosummary'
   - 'autoapi.extension'

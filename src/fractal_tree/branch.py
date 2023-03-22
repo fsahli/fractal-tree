@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
 """
-This module contains the Branch class (one branch of the tree)  and the Nodes cl__name__ass
+This module contains the Branch class (one branch of the tree)
+and the Nodes class name
 """
 
 import numpy as np
@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 
 class Branch:
     """Class that contains a branch of the fractal tree
-
 
     Args:
         mesh:

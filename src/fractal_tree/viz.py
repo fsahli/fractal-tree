@@ -10,13 +10,7 @@ def write_line_VTU(nodes, elements, filename):
     piece = ET.SubElement(UG, "Piece")
     piece.set("NumberOfPoints", str(len(nodes)))
     piece.set("NumberOfCells", str(len(elements)))
-    # 	pointdata=ET.SubElement(piece,'PointData')
-    # 	pointdata.set('Scalars','scalars')
-    # 	DApd=ET.SubElement(pointdata,'DataArray')
-    # 	DApd.set('type','Float32')
-    # 	DApd.set('Name','phi')
-    # 	DApd.set('Format','ascii')
-    # 	DApd.text=''
+
     points = ET.SubElement(piece, "Points")
     DAp = ET.SubElement(points, "DataArray")
     DAp.set("type", "Float32")
@@ -26,7 +20,7 @@ def write_line_VTU(nodes, elements, filename):
     DAp.text = "\n".join(
         map(lambda a: str(a[0]) + " " + str(a[1]) + " " + str(a[2]), nodes)
     )
-    # 	DApd.text='\n'.join(map(str,NT11.values()))
+
     cell = ET.SubElement(piece, "Cells")
     DAc = ET.SubElement(cell, "DataArray")
     DAc.set("type", "Int32")

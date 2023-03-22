@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 This module contains the mesh class. This class is the
 triangular surface where the fractal tree is grown.
@@ -12,16 +11,28 @@ import meshio
 def closest_point_projection(
     triangles, pre_projected_point, verts, connectivity, normals
 ):
-    CPP = []
-    for tri in triangles:
-        CPP.append(
-            np.dot(
-                pre_projected_point - verts[connectivity[tri, 0], :],
-                normals[tri, :],
-            )
-        )
 
-    return np.array(CPP)
+    return (
+        (pre_projected_point - verts[connectivity[triangles, 0], :])
+        * normals[triangles, :]
+    ).sum(-1)
+
+
+def get_node_to_triangle(connectivity):
+    node_to_tri = collections.defaultdict(list)
+    for i in range(len(connectivity)):
+        for j in range(3):
+            node_to_tri[connectivity[i, j]].append(i)
+    return node_to_tri
+
+
+def compute_normals(connectivity, verts):
+
+    U = verts[connectivity[:, 1], :] - verts[connectivity[:, 0], :]
+    V = verts[connectivity[:, 2], :] - verts[connectivity[:, 0], :]
+    N = np.cross(U, V)
+    normals = (N.T / np.linalg.norm(N, axis=1)).T
+    return normals
 
 
 class Mesh:
@@ -32,7 +43,7 @@ class Mesh:
 
     Args:
         filename (str):
-        the path and filename of the .obj file with the mesh.
+            the path and filename of the .obj file with the mesh.
 
     Attributes:
         verts (array):
@@ -54,7 +65,6 @@ class Mesh:
         tree (scipy.spatial.cKDTree):
             a k-d tree to compute the distance from any point
             to the closest node in the mesh.
-
     """
 
     def __init__(self, filename):
@@ -63,21 +73,9 @@ class Mesh:
         connectivity = msh.cells[0].data
         self.verts = np.array(verts)
         self.connectivity = np.array(connectivity)
-        self.normals = np.zeros(self.connectivity.shape)
-        self.node_to_tri = collections.defaultdict(list)
-        for i in range(len(self.connectivity)):
-            for j in range(3):
-                self.node_to_tri[self.connectivity[i, j]].append(i)
-            u = (
-                self.verts[self.connectivity[i, 1], :]
-                - self.verts[self.connectivity[i, 0], :]
-            )
-            v = (
-                self.verts[self.connectivity[i, 2], :]
-                - self.verts[self.connectivity[i, 0], :]
-            )
-            n = np.cross(u, v)
-            self.normals[i, :] = n / np.linalg.norm(n)
+
+        self.normals = compute_normals(self.connectivity, verts=self.verts)
+        self.node_to_tri = get_node_to_triangle(connectivity=self.connectivity)
 
         self.tree = cKDTree(verts)
 
@@ -87,7 +85,7 @@ class Mesh:
 
         Args:
             point (array):
-            coordinates of the point to project.
+                coordinates of the point to project.
 
         Returns:
             projected_point (array):
@@ -120,8 +118,10 @@ class Mesh:
         # Sort from closest to furthest
         order = np.abs(CPP).argsort()
 
-        # Check if point is in triangle
-        intriangle = -1
+        return self.check_in_triangle(order, triangles, pre_projected_point, CPP)
+
+    def check_in_triangle(self, order, triangles, pre_projected_point, CPP):
+
         for o in order:
             i = triangles[o]
 
@@ -149,6 +149,6 @@ class Mesh:
 
                 if r <= 1 and t <= 1 and (r + t) <= 1.001:
 
-                    intriangle = i
-                    break
-        return projected_point, intriangle
+                    return projected_point, i
+
+        return projected_point, -1
