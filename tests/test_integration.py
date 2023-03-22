@@ -24,7 +24,7 @@ def test_integration(filename):
     param = FractalTreeParameters(filename=filename)
 
     # Read Mesh
-    mesh = Mesh(filename=here / ".." / "examples" / "sphere.obj")
+    mesh = Mesh.from_file(filename=here / ".." / "examples" / "sphere.obj")
 
     np.random.seed(1234)
     branches, nodes = generate_fractal_tree(mesh, param)

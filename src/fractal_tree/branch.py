@@ -16,22 +16,24 @@ class Branch:
     Args:
         mesh:
             an object of the mesh class, where the fractal tree will grow
-        init_node (int):
+        initial_node (int):
             initial node to grow the branch. This is an index that refers
             to a node in the nodes.nodes array.
-        init_dir (array):
+        initial_direction (array):
             initial direction to grow the branch. In general, it refers to
             the direction of the last segment of the mother brach.
-        init_tri (int):
-            the index of triangle of the mesh where the init_node sits.
+        initial_triangle (int):
+            the index of triangle of the mesh where the initial_node sits.
         l (float):
             total length of the branch
         angle (float):
-            angle (rad) with respect to the init_dir in the plane of the init_tri triangle
+            angle (rad) with respect to the initial_direction
+            in the plane of the initial_triangle triangle
         w (float):
             repulsitivity parameter. Controls how much the branches repel each other.
         nodes:
-            the object of the class nodes that contains all the nodes of the existing branches.
+            the object of the class nodes that contains all the
+            nodes of the existing branches.
         brother_nodes (list):
             the nodes of the brother and mother branches, to be excluded
             from the collision detection between branches.
@@ -61,41 +63,39 @@ class Branch:
     def __init__(
         self,
         mesh,
-        init_node,
-        init_dir,
-        init_tri,
-        l,
+        initial_node,
+        initial_direction,
+        initial_triangle,
+        length,
         angle,
         w,
         nodes,
         brother_nodes,
         Nsegments,
     ):
-        #        self.nnodes=0
+
         self.child = [0, 0]
         self.dir = np.array([0.0, 0.0, 0.0])
         self.nodes = []
         self.triangles = []
-        #        self.normal=np.array([0.0,0.0,0.0])
+
         self.queue = []
         self.growing = True
-        init_normal = mesh.normals[init_tri]
+        init_normal = mesh.normals[initial_triangle]
         nodes.update_collision_tree(brother_nodes)
-        #        global_nnodes=len(nodes.nodes)
 
-        #  R=np.array([[np.cos(angle),-np.sin(angle)],[ np.sin(angle), np.cos(angle)]])
-        inplane = -np.cross(init_dir, init_normal)
-        dir = np.cos(angle) * init_dir + np.sin(angle) * inplane
+        inplane = -np.cross(initial_direction, init_normal)
+        dir = np.cos(angle) * initial_direction + np.sin(angle) * inplane
         dir = dir / np.linalg.norm(dir)
-        self.nodes.append(init_node)
-        self.queue.append(nodes.nodes[init_node])
-        self.triangles.append(init_tri)
+        self.nodes.append(initial_node)
+        self.queue.append(nodes.nodes[initial_node])
+        self.triangles.append(initial_triangle)
         grad = nodes.gradient(self.queue[0])
         dir = (dir + w * grad) / np.linalg.norm(dir + w * grad)
 
         for i in range(1, Nsegments):
             intriangle = self.add_node_to_queue(
-                mesh, self.queue[i - 1], dir * l / Nsegments
+                mesh, self.queue[i - 1], dir * length / Nsegments
             )
 
             if not intriangle:
@@ -103,7 +103,7 @@ class Branch:
                 self.growing = False
                 break
             collision = nodes.collision(self.queue[i])
-            if collision[1] < l / 5.0:
+            if collision[1] < length / 5.0:
                 logger.debug(f"Collision {i}: {collision}")
                 self.growing = False
                 self.queue.pop()
@@ -127,18 +127,18 @@ class Branch:
     #   if shared_node is not -1:
     #      self.nodes.append(shared_node)
 
-    def add_node_to_queue(self, mesh, init_node, dir):
+    def add_node_to_queue(self, mesh, initial_node, dir):
         """Functions that projects a node in the mesh surface
         and it to the queue is it lies in the surface.
 
         Args:
             mesh:
                 an object of the mesh class, where the fractal tree will grow
-            init_node (array):
+            initial_node (array):
                 vector that contains the coordinates of the
                 last node added in the branch.
             dir (array):
-                vector that contains the direction from the init_node
+                vector that contains the direction from the initial_node
                 to the node to project.
 
         Return:
@@ -146,7 +146,7 @@ class Branch:
                 true if the new node is in the triangle.
 
         """
-        point, triangle = mesh.project_new_point(init_node + dir)
+        point, triangle = mesh.project_new_point(initial_node + dir)
 
         if triangle >= 0:
             self.queue.append(point)
@@ -163,7 +163,7 @@ class Nodes:
     functions to compute distance related quantities.
 
     Args:
-        init_node (array):
+        initial_node (array):
             an array with the coordinates of the initial node of the first branch.
 
     Attributes:
@@ -184,9 +184,9 @@ class Nodes:
 
     """
 
-    def __init__(self, init_node):
+    def __init__(self, initial_node):
         self.nodes = []
-        self.nodes.append(init_node)
+        self.nodes.append(initial_node)
         self.last_node = 0
         self.end_nodes = []
         self.tree = cKDTree(self.nodes)

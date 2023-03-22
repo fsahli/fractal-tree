@@ -172,7 +172,7 @@ class FractalTreeParameters:
     """
 
     filename: str = "results"
-    init_node: np.ndarray = np.array([-1.0, 0.0, 0.0])
+    # init_node: np.ndarray = np.array([-1.0, 0.0, 0.0])
     second_node: np.ndarray = np.array([-0.964, 0.00, 0.266])
     init_length: float = 0.1
     N_it: int = 10  # Number of iterations (generations of branches)
@@ -221,12 +221,12 @@ def generate_fractal_tree(
         parameters = FractalTreeParameters()
 
     # Define the initial direction
-    initial_direction = (
-        parameters.second_node - parameters.init_node
-    ) / np.linalg.norm(parameters.second_node - parameters.init_node)
+    initial_direction = (parameters.second_node - mesh.init_node) / np.linalg.norm(
+        parameters.second_node - mesh.init_node
+    )
 
     # Initialize the nodes object, contains the nodes and all the distance functions
-    nodes = Nodes(parameters.init_node)
+    nodes = Nodes(mesh.init_node)
     # Project the first node to the mesh.
     point, tri = mesh.project_new_point(nodes.nodes[0])
     if tri >= 0:

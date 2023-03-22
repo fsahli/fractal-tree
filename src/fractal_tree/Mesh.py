@@ -2,6 +2,9 @@
 This module contains the mesh class. This class is the
 triangular surface where the fractal tree is grown.
 """
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Optional
 import numpy as np
 from scipy.spatial import cKDTree
 import collections
@@ -35,6 +38,7 @@ def compute_normals(connectivity, verts):
     return normals
 
 
+@dataclass
 class Mesh:
     """Class that contains the mesh where fractal tree is grown.
     It must be Wavefront .obj file. Be careful on how the normals
@@ -67,17 +71,48 @@ class Mesh:
             to the closest node in the mesh.
     """
 
-    def __init__(self, filename):
-        msh = meshio.read(filename)
-        verts = msh.points
-        connectivity = msh.cells[0].data
-        self.verts = np.array(verts)
-        self.connectivity = np.array(connectivity)
+    verts: np.ndarray
+    connectivity: np.ndarray
+    init_node: Optional[np.ndarray] = None
+    normals: np.ndarray = field(init=False)
+    node_to_tri: dict[int, list[int]] = field(init=False)
+    tree: cKDTree = field(init=False)
+
+    def __post_init__(self):
+
+        self.verts = np.array(self.verts)
+        self.connectivity = np.array(self.connectivity)
 
         self.normals = compute_normals(self.connectivity, verts=self.verts)
         self.node_to_tri = get_node_to_triangle(connectivity=self.connectivity)
 
-        self.tree = cKDTree(verts)
+        self.tree = cKDTree(self.verts)
+        if self.init_node is None:
+            self.init_node = self.verts[self.verts[:, 0].argmin(), :]
+        self.init_node = np.array(self.init_node)
+
+    @classmethod
+    def from_file(
+        cls,
+        filename,
+        marker: Optional[str] = None,
+        init_node: Optional[np.ndarray] = None,
+    ):
+        msh = meshio.read(filename)
+        verts = msh.points
+        if marker is not None and Path(filename).suffix == ".msh":  # Gmsh specific
+            tag = msh.field_data[marker][0]
+            # Find the correct indices
+            inds = [
+                i for i, x in enumerate(msh.cell_data["gmsh:physical"]) if x[0] == tag
+            ]
+
+        else:
+            inds = list(range(len(msh.cells)))
+
+        # breakpoint()
+        connectivity = np.vstack([msh.cells[i].data for i in inds])
+        return cls(verts=verts, connectivity=connectivity, init_node=init_node)
 
     def project_new_point(self, point):
         """This function projects any point to
