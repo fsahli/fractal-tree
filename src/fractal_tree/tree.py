@@ -5,7 +5,7 @@ This module contains the function that creates the fractal tree.
 
 from dataclasses import dataclass
 import sys
-from typing import Optional
+from typing import Optional, NamedTuple
 import numpy as np
 import logging
 
@@ -16,7 +16,7 @@ from .viz import write_line_VTU
 logger = logging.getLogger(__name__)
 
 
-def grow_fascicles(branches, parameters, mesh, nodes, ien, last_branch):
+def grow_fascicles(branches, parameters, mesh, nodes, lines, last_branch):
     brother_nodes = []
     brother_nodes += branches[0].nodes
     for i_branch in range(len(parameters.fascicles_angles)):
@@ -37,7 +37,7 @@ def grow_fascicles(branches, parameters, mesh, nodes, ien, last_branch):
         brother_nodes += branches[last_branch].nodes
 
         for i_n in range(len(branches[last_branch].nodes) - 1):
-            ien.append(
+            lines.append(
                 [
                     branches[last_branch].nodes[i_n],
                     branches[last_branch].nodes[i_n + 1],
@@ -48,7 +48,7 @@ def grow_fascicles(branches, parameters, mesh, nodes, ien, last_branch):
 
 
 def run_generation(
-    branches_to_grow, parameters, branches, last_branch, mesh, nodes, ien
+    branches_to_grow, parameters, branches, last_branch, mesh, nodes, lines
 ):
     choices = 2 * np.random.randint(2, size=len(branches_to_grow)) - 1
     lengths = np.random.normal(0, parameters.std_length, size=2 * len(branches_to_grow))
@@ -84,9 +84,9 @@ def run_generation(
                 brother_nodes,
                 int(parameters.length / parameters.l_segment),
             )
-            # Add nodes to IEN
+            # Add nodes to lines
             for i_n in range(len(branches[last_branch].nodes) - 1):
-                ien.append(
+                lines.append(
                     [
                         branches[last_branch].nodes[i_n],
                         branches[last_branch].nodes[i_n + 1],
@@ -100,19 +100,19 @@ def run_generation(
             branches[g].child[j] = last_branch
             angle = -angle
     branches_to_grow = new_branches_to_grow
-    return branches, nodes, ien, branches_to_grow, ien, last_branch
+    return branches, nodes, lines, branches_to_grow, lines, last_branch
 
 
-def save_tree(parameters, nodes, ien):
+def save_tree(parameters, nodes, lines):
     if parameters.save_paraview:
 
         logger.info("Finished growing, writing paraview file")
         xyz = np.zeros((len(nodes.nodes), 3))
         for i in range(len(nodes.nodes)):
             xyz[i, :] = nodes.nodes[i]
-        write_line_VTU(xyz, ien, parameters.filename + ".vtu")
+        write_line_VTU(xyz, lines, parameters.filename + ".vtu")
 
-    np.savetxt(parameters.filename + "_ien.txt", ien, fmt="%d")
+    np.savetxt(parameters.filename + "_lines.txt", lines, fmt="%d")
     np.savetxt(parameters.filename + "_xyz.txt", xyz)
     np.savetxt(parameters.filename + "_endnodes.txt", nodes.end_nodes, fmt="%d")
 
@@ -138,12 +138,6 @@ class FractalTreeParameters:
             number of generations of branches.
         length (float):
             average length of the branches in the tree.
-        std_length (float):
-            standard deviation of the length.
-            Set to zero to avoid random lengths.
-        min_length (float):
-            minimum length of the branches.
-            To avoid randomly generated negative lengths.
         branch_angle (float):
             angle with respect to the direction of
             the previous branch and the new branch.
@@ -172,7 +166,6 @@ class FractalTreeParameters:
     """
 
     filename: str = "results"
-    # init_node: np.ndarray = np.array([-1.0, 0.0, 0.0])
     second_node: np.ndarray = np.array([-0.964, 0.00, 0.266])
     init_length: float = 0.1
     N_it: int = 10  # Number of iterations (generations of branches)
@@ -189,33 +182,39 @@ class FractalTreeParameters:
 
     @property
     def std_length(self) -> float:
-        """Standard deviation of the length"""
+        """Standard deviation of the length.
+        Set to zero to avoid random lengths."""
         return np.sqrt(0.2) * self.length
 
     @property
     def min_length(self) -> float:
-        """Min length to avoid negative length"""
+        """Minimum length of the branches.
+        To avoid randomly generated negative lengths."""
         return self.length / 10.0
 
     def as_dict(self):
         return {k: v for k, v in self.__dict__.items()}
 
 
+class FractalTreeResult(NamedTuple):
+    branches: dict[int, Branch]
+    nodes: Nodes
+
+
 def generate_fractal_tree(
     mesh: Mesh, parameters: Optional[FractalTreeParameters] = None
-):
+) -> FractalTreeResult:
     """This function creates the fractal tree.
 
     Args:
-        parameters (Parameters object):
-            this object contains all the parameters that
+        parameters (Optional[FractalTreeParameters]):
+            This object contains all the parameters that
             define the tree. See the parameters module documentation for details:
 
     Returns:
-        branches (dict):
-            A dictionary that contains all the branches objects.
-        nodes (nodes object):
-            the object that contains all the nodes of the tree.
+        FractalTreeResult: branches containes a dictionary that contains
+        all the branches objects, and nodes is the object that
+        contains all the nodes of the tree.
     """
     if parameters is None:
         parameters = FractalTreeParameters()
@@ -228,9 +227,9 @@ def generate_fractal_tree(
     # Initialize the nodes object, contains the nodes and all the distance functions
     nodes = Nodes(mesh.init_node)
     # Project the first node to the mesh.
-    point, tri = mesh.project_new_point(nodes.nodes[0])
-    if tri >= 0:
-        init_tri = tri
+    point = mesh.project_new_point(nodes.nodes[0])
+    if point.triangle_index >= 0:
+        initial_triangle = point.triangle_index
     else:
         logger.error("initial point not in mesh")
         sys.exit(0)
@@ -239,37 +238,37 @@ def generate_fractal_tree(
     last_branch = 0
     # Compute the first branch
     branches[last_branch] = Branch(
-        mesh,
-        0,
-        initial_direction,
-        init_tri,
-        parameters.init_length,
-        0.0,
-        0.0,
-        nodes,
-        [0],
-        int(parameters.init_length / parameters.l_segment),
+        mesh=mesh,
+        initial_node=0,
+        initial_direction=initial_direction,
+        initial_triangle=initial_triangle,
+        length=parameters.init_length,
+        angle=0.0,
+        repulsitivity=0.0,
+        nodes=nodes,
+        brother_nodes=[0],
+        num_segments=int(parameters.init_length / parameters.l_segment),
     )
     branches_to_grow = []
     branches_to_grow.append(last_branch)
 
-    ien = []
+    lines = []
     for i_n in range(len(branches[last_branch].nodes) - 1):
-        ien.append(
+        lines.append(
             [branches[last_branch].nodes[i_n], branches[last_branch].nodes[i_n + 1]]
         )
     # To grow fascicles
     if parameters.generate_fascicles:
         branches_to_grow, last_branch = grow_fascicles(
-            branches, parameters, mesh, nodes, ien, last_branch
+            branches, parameters, mesh, nodes, lines, last_branch
         )
 
     for _ in range(parameters.N_it):
-        branches, nodes, ien, branches_to_grow, ien, last_branch = run_generation(
-            branches_to_grow, parameters, branches, last_branch, mesh, nodes, ien
+        branches, nodes, lines, branches_to_grow, lines, last_branch = run_generation(
+            branches_to_grow, parameters, branches, last_branch, mesh, nodes, lines
         )
 
     if parameters.save:
-        save_tree(parameters, nodes, ien)
+        save_tree(parameters, nodes, lines)
 
-    return branches, nodes
+    return FractalTreeResult(branches, nodes)

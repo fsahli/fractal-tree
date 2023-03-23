@@ -4,7 +4,7 @@ triangular surface where the fractal tree is grown.
 """
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
+from typing import Optional, NamedTuple
 import numpy as np
 from scipy.spatial import cKDTree
 import collections
@@ -36,6 +36,11 @@ def compute_normals(connectivity, verts):
     N = np.cross(U, V)
     normals = (N.T / np.linalg.norm(N, axis=1)).T
     return normals
+
+
+class ProjectedPoint(NamedTuple):
+    point: np.ndarray
+    triangle_index: int
 
 
 @dataclass
@@ -114,7 +119,7 @@ class Mesh:
         connectivity = np.vstack([msh.cells[i].data for i in inds])
         return cls(verts=verts, connectivity=connectivity, init_node=init_node)
 
-    def project_new_point(self, point):
+    def project_new_point(self, point) -> ProjectedPoint:
         """This function projects any point to
         the surface defined by the mesh.
 
@@ -123,11 +128,11 @@ class Mesh:
                 coordinates of the point to project.
 
         Returns:
-            projected_point (array):
-                the coordinates of the projected point that lies in the surface.
-             intriangle (int):
-                the index of the triangle where the projected point lies.
-                If the point is outside surface, intriangle=-1.
+            ProjectedPoint: Contains projected_point which is the coordinates
+            of the projected point that lies in the surface. triangle_index is
+            the index of the triangle where the projected point lies.
+            If the point is outside surface, triangle_index=-1.
+
         """
         # Get the closest point
         d, node = self.tree.query(point)
@@ -155,7 +160,9 @@ class Mesh:
 
         return self.check_in_triangle(order, triangles, pre_projected_point, CPP)
 
-    def check_in_triangle(self, order, triangles, pre_projected_point, CPP):
+    def check_in_triangle(
+        self, order, triangles, pre_projected_point, CPP
+    ) -> ProjectedPoint:
 
         for o in order:
             i = triangles[o]
@@ -184,6 +191,6 @@ class Mesh:
 
                 if r <= 1 and t <= 1 and (r + t) <= 1.001:
 
-                    return projected_point, i
+                    return ProjectedPoint(point=projected_point, triangle_index=i)
 
-        return projected_point, -1
+        return ProjectedPoint(point=projected_point, triangle_index=-1)

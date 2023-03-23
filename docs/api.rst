@@ -4,33 +4,16 @@ fractal-tree modules
 
 Testing more verbose documentation.
 
-.. autosummary::
-   :toctree: _autosummary
-   :recursive:
-
-   fractal_tree.branch
+.. automodule:: fractal_tree.branch
+    :members:
 
 
-.. autosummary::
-   :toctree: _autosummary
-   :recursive:
+.. automodule:: fractal_tree.tree
+    :members:
 
-   fractal_tree.tree
 
-.. autosummary::
-   :toctree: _autosummary
-   :recursive:
+.. automodule:: fractal_tree.mesh
+    :members:
 
-   fractal_tree.mesh
-
-.. autosummary::
-   :toctree: _autosummary
-   :recursive:
-
-   fractal_tree.parameters
-
-.. autosummary::
-   :toctree: _autosummary
-   :recursive:
-
-   fractal_tree.viz
+.. automodule:: fractal_tree.viz
+    :members:

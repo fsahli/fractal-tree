@@ -29,7 +29,7 @@ class Branch:
         angle (float):
             angle (rad) with respect to the initial_direction
             in the plane of the initial_triangle triangle
-        w (float):
+        repulsitivity (float):
             repulsitivity parameter. Controls how much the branches repel each other.
         nodes:
             the object of the class nodes that contains all the
@@ -37,7 +37,7 @@ class Branch:
         brother_nodes (list):
             the nodes of the brother and mother branches, to be excluded
             from the collision detection between branches.
-        Nsegments (int):
+        num_segments (int):
             number of segments to divide the branch.
 
 
@@ -68,10 +68,10 @@ class Branch:
         initial_triangle,
         length,
         angle,
-        w,
+        repulsitivity,
         nodes,
         brother_nodes,
-        Nsegments,
+        num_segments,
     ):
 
         self.child = [0, 0]
@@ -91,11 +91,11 @@ class Branch:
         self.queue.append(nodes.nodes[initial_node])
         self.triangles.append(initial_triangle)
         grad = nodes.gradient(self.queue[0])
-        dir = (dir + w * grad) / np.linalg.norm(dir + w * grad)
+        dir = (dir + repulsitivity * grad) / np.linalg.norm(dir + repulsitivity * grad)
 
-        for i in range(1, Nsegments):
+        for i in range(1, num_segments):
             intriangle = self.add_node_to_queue(
-                mesh, self.queue[i - 1], dir * length / Nsegments
+                mesh, self.queue[i - 1], dir * length / num_segments
             )
 
             if not intriangle:
@@ -114,7 +114,9 @@ class Branch:
             normal = mesh.normals[self.triangles[i], :]
             # Project the gradient to the surface
             grad = grad - (np.dot(grad, normal)) * normal
-            dir = (dir + w * grad) / np.linalg.norm(dir + w * grad)
+            dir = (dir + repulsitivity * grad) / np.linalg.norm(
+                dir + repulsitivity * grad
+            )
         nodes_id = nodes.add_nodes(self.queue[1:])
         [self.nodes.append(x) for x in nodes_id]
         if not self.growing:
