@@ -39,7 +39,7 @@ class ProjectedPoint(NamedTuple):
     triangle_index: int
 
 
-class InvaildNodeError(Exception):
+class InvalidNodeError(Exception):
     pass
 
 
@@ -119,7 +119,7 @@ class Mesh:
         # Get triangles connected to that node
         triangles = self.node_to_tri[node]
         if len(triangles) == 0:
-            raise InvaildNodeError(
+            raise InvalidNodeError(
                 f"node {node} with point {point} not connected to triangles, check your mesh"
             )
 

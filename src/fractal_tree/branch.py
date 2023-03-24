@@ -6,7 +6,7 @@ and the Nodes class name
 import numpy as np
 import logging
 from scipy.spatial import cKDTree
-from .mesh import InvaildNodeError
+from .mesh import InvalidNodeError
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +74,6 @@ class Branch:
         brother_nodes,
         num_segments,
     ):
-
         self.child = [0, 0]
         self.dir = np.array([0.0, 0.0, 0.0])
         self.nodes = []
@@ -151,7 +150,7 @@ class Branch:
         """
         try:
             point, triangle = mesh.project_new_point(initial_node + dir)
-        except InvaildNodeError:
+        except InvalidNodeError:
             return False
 
         if triangle >= 0:
