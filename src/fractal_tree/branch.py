@@ -6,6 +6,7 @@ and the Nodes class name
 import numpy as np
 import logging
 from scipy.spatial import cKDTree
+from .mesh import InvaildNodeError
 
 logger = logging.getLogger(__name__)
 
@@ -99,7 +100,7 @@ class Branch:
             )
 
             if not intriangle:
-                logger.info(f"Point {i} not in triangle")
+                logger.debug(f"Point {i} not in triangle")
                 self.growing = False
                 break
             collision = nodes.collision(self.queue[i])
@@ -129,7 +130,7 @@ class Branch:
     #   if shared_node is not -1:
     #      self.nodes.append(shared_node)
 
-    def add_node_to_queue(self, mesh, initial_node, dir):
+    def add_node_to_queue(self, mesh, initial_node, dir) -> bool:
         """Functions that projects a node in the mesh surface
         and it to the queue is it lies in the surface.
 
@@ -148,7 +149,10 @@ class Branch:
                 true if the new node is in the triangle.
 
         """
-        point, triangle = mesh.project_new_point(initial_node + dir)
+        try:
+            point, triangle = mesh.project_new_point(initial_node + dir)
+        except InvaildNodeError:
+            return False
 
         if triangle >= 0:
             self.queue.append(point)
@@ -267,7 +271,7 @@ class Nodes:
                 np.array([-100000000000.0, -100000000000.0, -100000000000.0])
             ]
             self.nodes_to_consider_keys = [100000000]
-            logger.info("no nodes to consider")
+            logger.debug("no nodes to consider")
         self.collision_tree = cKDTree(nodes_to_consider)
 
     def collision(self, point):

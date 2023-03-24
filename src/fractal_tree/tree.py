@@ -8,6 +8,7 @@ import sys
 from typing import Optional, NamedTuple
 import numpy as np
 import logging
+import tqdm
 
 from .branch import Nodes, Branch
 from .mesh import Mesh
@@ -168,6 +169,7 @@ class FractalTreeParameters:
 
     filename: str = "results"
     second_node: Optional[np.ndarray] = None
+    initial_direction: Optional[np.ndarray] = None
     init_length: float = 0.1
     N_it: int = 10  # Number of iterations (generations of branches)
     length: float = 0.1  # Median length of the branches
@@ -238,16 +240,17 @@ def generate_fractal_tree(
     if parameters is None:
         parameters = FractalTreeParameters()
 
-    # Get the second node to define the initial direction
-    second_node = parameters.second_node
-    if second_node is None:
-        # If no node is specified, lets just pick a random node
-        second_node = mesh.verts[np.random.choice(mesh.valid_nodes), :]
+    if parameters.initial_direction is None:
+        # Get the second node to define the initial direction
+        second_node = parameters.second_node
+        if second_node is None:
+            # If no node is specified, lets just pick a random node
+            second_node = mesh.verts[np.random.choice(mesh.valid_nodes), :]
 
-    # Define the initial direction
-    initial_direction = node_direction(
-        src=mesh.init_node, target=parameters.second_node
-    )
+        # Define the initial direction
+        initial_direction = node_direction(src=mesh.init_node, target=second_node)
+    else:
+        initial_direction = parameters.initial_direction
 
     # Initialize the nodes object, contains the nodes and all the distance functions
     nodes = Nodes(mesh.init_node)
@@ -288,7 +291,7 @@ def generate_fractal_tree(
             branches, parameters, mesh, nodes, lines, last_branch
         )
 
-    for _ in range(parameters.N_it):
+    for _ in tqdm.tqdm(range(parameters.N_it)):
         branches, nodes, lines, branches_to_grow, lines, last_branch = run_generation(
             branches_to_grow, parameters, branches, last_branch, mesh, nodes, lines
         )

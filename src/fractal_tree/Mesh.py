@@ -3,18 +3,15 @@ This module contains the mesh class. This class is the
 triangular surface where the fractal tree is grown.
 """
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Optional, NamedTuple
 import numpy as np
 from scipy.spatial import cKDTree
 import collections
-import meshio
 
 
 def closest_point_projection(
     triangles, pre_projected_point, verts, connectivity, normals
 ):
-
     return (
         (pre_projected_point - verts[connectivity[triangles, 0], :])
         * normals[triangles, :]
@@ -30,7 +27,6 @@ def get_node_to_triangle(connectivity):
 
 
 def compute_normals(connectivity, verts):
-
     U = verts[connectivity[:, 1], :] - verts[connectivity[:, 0], :]
     V = verts[connectivity[:, 2], :] - verts[connectivity[:, 0], :]
     N = np.cross(U, V)
@@ -41,6 +37,10 @@ def compute_normals(connectivity, verts):
 class ProjectedPoint(NamedTuple):
     point: np.ndarray
     triangle_index: int
+
+
+class InvaildNodeError(Exception):
+    pass
 
 
 @dataclass
@@ -84,7 +84,6 @@ class Mesh:
     tree: cKDTree = field(init=False)
 
     def __post_init__(self):
-
         self.verts = np.array(self.verts)
         self.connectivity = np.array(self.connectivity)
 
@@ -98,32 +97,6 @@ class Mesh:
             min_node = self.verts[self.valid_nodes, 0].argmin()
             self.init_node = self.verts[self.valid_nodes[min_node], :]
         self.init_node = np.array(self.init_node)
-
-    @classmethod
-    def from_file(
-        cls,
-        filename,
-        marker: Optional[str] = None,
-        init_node: Optional[np.ndarray] = None,
-    ):
-        msh = meshio.read(filename)
-
-        verts = msh.points
-        if marker is not None and Path(filename).suffix == ".msh":  # Gmsh specific
-            tag = msh.field_data[marker][0]
-            # Find the correct indices
-            inds = [
-                i for i, x in enumerate(msh.cell_data["gmsh:physical"]) if x[0] == tag
-            ]
-
-        else:
-            inds = list(range(len(msh.cells)))
-
-        # breakpoint()
-        # d = [msh.cells[i].data for i in inds]
-        connectivity = np.vstack([msh.cells[i].data for i in inds])
-        # breakpoint()
-        return cls(verts=verts, connectivity=connectivity, init_node=init_node)
 
     def project_new_point(self, point) -> ProjectedPoint:
         """This function projects any point to
@@ -146,7 +119,9 @@ class Mesh:
         # Get triangles connected to that node
         triangles = self.node_to_tri[node]
         if len(triangles) == 0:
-            raise Exception("node not connected to triangles, check your mesh")
+            raise InvaildNodeError(
+                f"node {node} with point {point} not connected to triangles, check your mesh"
+            )
 
         # Compute the vertex normal as the avergage of the triangle normals.
         vertex_normal = np.sum(self.normals[triangles], axis=0)
@@ -169,7 +144,6 @@ class Mesh:
     def check_in_triangle(
         self, order, triangles, pre_projected_point, CPP
     ) -> ProjectedPoint:
-
         for o in order:
             i = triangles[o]
 
@@ -196,7 +170,6 @@ class Mesh:
                 t = np.linalg.norm(uxw) / np.linalg.norm(vxu)
 
                 if r <= 1 and t <= 1 and (r + t) <= 1.001:
-
                     return ProjectedPoint(point=projected_point, triangle_index=i)
 
         return ProjectedPoint(point=projected_point, triangle_index=-1)

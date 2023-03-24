@@ -1,7 +1,7 @@
 import numpy as np
 from pathlib import Path
 import pytest
-
+import meshio
 
 from fractal_tree.tree import generate_fractal_tree, FractalTreeParameters
 from fractal_tree.mesh import Mesh
@@ -20,13 +20,14 @@ def filename():
 
 
 def test_integration(filename):
-
     param = FractalTreeParameters(
         filename=filename, second_node=np.array([-0.964, 0.00, 0.266])
     )
 
     # Read Mesh
-    mesh = Mesh.from_file(filename=here / ".." / "examples" / "sphere.obj")
+    fname = here / ".." / "examples" / "sphere.obj"
+    msh = meshio.read(fname)
+    mesh = Mesh(verts=msh.points, connectivity=msh.cells[0].data)
 
     np.random.seed(1234)
     branches, nodes = generate_fractal_tree(mesh, param)
