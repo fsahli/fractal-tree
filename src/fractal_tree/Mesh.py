@@ -90,10 +90,13 @@ class Mesh:
 
         self.normals = compute_normals(self.connectivity, verts=self.verts)
         self.node_to_tri = get_node_to_triangle(connectivity=self.connectivity)
+        self.valid_nodes = np.array(tuple(self.node_to_tri.keys()))
 
         self.tree = cKDTree(self.verts)
+
         if self.init_node is None:
-            self.init_node = self.verts[self.verts[:, 0].argmin(), :]
+            min_node = self.verts[self.valid_nodes, 0].argmin()
+            self.init_node = self.verts[self.valid_nodes[min_node], :]
         self.init_node = np.array(self.init_node)
 
     @classmethod
@@ -104,6 +107,7 @@ class Mesh:
         init_node: Optional[np.ndarray] = None,
     ):
         msh = meshio.read(filename)
+
         verts = msh.points
         if marker is not None and Path(filename).suffix == ".msh":  # Gmsh specific
             tag = msh.field_data[marker][0]
@@ -116,7 +120,9 @@ class Mesh:
             inds = list(range(len(msh.cells)))
 
         # breakpoint()
+        # d = [msh.cells[i].data for i in inds]
         connectivity = np.vstack([msh.cells[i].data for i in inds])
+        # breakpoint()
         return cls(verts=verts, connectivity=connectivity, init_node=init_node)
 
     def project_new_point(self, point) -> ProjectedPoint:

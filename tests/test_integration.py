@@ -21,7 +21,9 @@ def filename():
 
 def test_integration(filename):
 
-    param = FractalTreeParameters(filename=filename)
+    param = FractalTreeParameters(
+        filename=filename, second_node=np.array([-0.964, 0.00, 0.266])
+    )
 
     # Read Mesh
     mesh = Mesh.from_file(filename=here / ".." / "examples" / "sphere.obj")

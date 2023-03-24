@@ -132,6 +132,7 @@ class FractalTreeParameters:
             included in the tree. Please avoid selecting
             nodes that are connected to the init_node by a
             single edge in the mesh, because it causes numerical issues.
+            If no node is provided, a random node will be selected
         init_length (float):
             length of the first branch.
         N_it (int):
@@ -166,7 +167,7 @@ class FractalTreeParameters:
     """
 
     filename: str = "results"
-    second_node: np.ndarray = np.array([-0.964, 0.00, 0.266])
+    second_node: Optional[np.ndarray] = None
     init_length: float = 0.1
     N_it: int = 10  # Number of iterations (generations of branches)
     length: float = 0.1  # Median length of the branches
@@ -201,6 +202,24 @@ class FractalTreeResult(NamedTuple):
     nodes: Nodes
 
 
+def node_direction(src: np.ndarray, target: Optional[np.ndarray] = None) -> np.ndarray:
+    """Return the direction from src to target.
+
+    Parameters
+    ----------
+    src : np.ndarray
+        Source node
+    target : Optional[np.ndarray]
+        Target node
+
+    Returns
+    -------
+    np.ndarray
+        The unit vector from src to node 2
+    """
+    return (target - src) / np.linalg.norm(target - src)
+
+
 def generate_fractal_tree(
     mesh: Mesh, parameters: Optional[FractalTreeParameters] = None
 ) -> FractalTreeResult:
@@ -219,9 +238,15 @@ def generate_fractal_tree(
     if parameters is None:
         parameters = FractalTreeParameters()
 
+    # Get the second node to define the initial direction
+    second_node = parameters.second_node
+    if second_node is None:
+        # If no node is specified, lets just pick a random node
+        second_node = mesh.verts[np.random.choice(mesh.valid_nodes), :]
+
     # Define the initial direction
-    initial_direction = (parameters.second_node - mesh.init_node) / np.linalg.norm(
-        parameters.second_node - mesh.init_node
+    initial_direction = node_direction(
+        src=mesh.init_node, target=parameters.second_node
     )
 
     # Initialize the nodes object, contains the nodes and all the distance functions
