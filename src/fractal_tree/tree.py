@@ -1,8 +1,7 @@
 """
 This module contains the function that creates the fractal tree.
 """
-
-
+from __future__ import annotations
 from dataclasses import dataclass
 import sys
 from typing import Optional, NamedTuple
@@ -106,7 +105,6 @@ def run_generation(
 
 def save_tree(parameters, nodes, lines):
     if parameters.save_paraview:
-
         logger.info("Finished growing, writing paraview file")
         xyz = np.zeros((len(nodes.nodes), 3))
         for i in range(len(nodes.nodes)):

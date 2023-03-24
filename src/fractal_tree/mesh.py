@@ -2,6 +2,7 @@
 This module contains the mesh class. This class is the
 triangular surface where the fractal tree is grown.
 """
+from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Optional, NamedTuple
 import numpy as np
