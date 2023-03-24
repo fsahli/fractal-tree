@@ -5,9 +5,18 @@ Created on Tue Dec  1 11:02:34 2015
 @author: fsc
 """
 import logging
-from fractal_tree.FractalTree import Fractal_Tree_3D
-from fractal_tree.parameters import Parameters
+import meshio
+from fractal_tree import generate_fractal_tree, FractalTreeParameters, Mesh
 
 logging.basicConfig(level=logging.INFO)
-param = Parameters()
-branches, nodes = Fractal_Tree_3D(param)
+fname = "sphere.obj"
+msh = meshio.read(fname)
+mesh = Mesh(verts=msh.points, connectivity=msh.cells[0].data)
+
+param = FractalTreeParameters(
+    filename="sphere-line3",
+    N_it=10,
+    second_node=mesh.verts[10, :],
+)
+
+branches, nodes = generate_fractal_tree(mesh, param)

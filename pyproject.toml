@@ -11,13 +11,17 @@ readme = "README.md"
 dependencies = [
     "numpy",
     "scipy",
-    "meshio"
+    "tqdm"
 ]
 
 [project.optional-dependencies]
 test = [
     "pytest",
     "pytest-cov",
+    "meshio",
+]
+demo = [
+    "meshio",
 ]
 dev = [
     "pdbpp",

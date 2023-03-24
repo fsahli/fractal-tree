@@ -21,10 +21,10 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Install package
-        run: pip install .[test]
+        run: python3 -m pip install -e .[test]
 
       - name: Run tests
-        run: python -m pytest
+        run: python3 -m pytest
 
       - name: Coverage report
         if: github.ref == 'refs/heads/main' && matrix.python-version == '3.10' && runner.os == 'Linux'

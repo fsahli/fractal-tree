@@ -1,14 +1,50 @@
-# -*- coding: utf-8 -*-
 """
 This module contains the mesh class. This class is the
 triangular surface where the fractal tree is grown.
 """
+from __future__ import annotations
+from dataclasses import dataclass, field
+from typing import Optional, NamedTuple
 import numpy as np
 from scipy.spatial import cKDTree
 import collections
-import meshio
 
 
+def closest_point_projection(
+    triangles, pre_projected_point, verts, connectivity, normals
+):
+    return (
+        (pre_projected_point - verts[connectivity[triangles, 0], :])
+        * normals[triangles, :]
+    ).sum(-1)
+
+
+def get_node_to_triangle(connectivity):
+    node_to_tri = collections.defaultdict(list)
+    for i in range(len(connectivity)):
+        for j in range(3):
+            node_to_tri[connectivity[i, j]].append(i)
+    return node_to_tri
+
+
+def compute_normals(connectivity, verts):
+    U = verts[connectivity[:, 1], :] - verts[connectivity[:, 0], :]
+    V = verts[connectivity[:, 2], :] - verts[connectivity[:, 0], :]
+    N = np.cross(U, V)
+    normals = (N.T / np.linalg.norm(N, axis=1)).T
+    return normals
+
+
+class ProjectedPoint(NamedTuple):
+    point: np.ndarray
+    triangle_index: int
+
+
+class InvalidNodeError(Exception):
+    pass
+
+
+@dataclass
 class Mesh:
     """Class that contains the mesh where fractal tree is grown.
     It must be Wavefront .obj file. Be careful on how the normals
@@ -17,7 +53,7 @@ class Mesh:
 
     Args:
         filename (str):
-        the path and filename of the .obj file with the mesh.
+            the path and filename of the .obj file with the mesh.
 
     Attributes:
         verts (array):
@@ -39,47 +75,44 @@ class Mesh:
         tree (scipy.spatial.cKDTree):
             a k-d tree to compute the distance from any point
             to the closest node in the mesh.
-
     """
 
-    def __init__(self, filename):
-        msh = meshio.read(filename)
-        verts = msh.points
-        connectivity = msh.cells[0].data
-        self.verts = np.array(verts)
-        self.connectivity = np.array(connectivity)
-        self.normals = np.zeros(self.connectivity.shape)
-        self.node_to_tri = collections.defaultdict(list)
-        for i in range(len(self.connectivity)):
-            for j in range(3):
-                self.node_to_tri[self.connectivity[i, j]].append(i)
-            u = (
-                self.verts[self.connectivity[i, 1], :]
-                - self.verts[self.connectivity[i, 0], :]
-            )
-            v = (
-                self.verts[self.connectivity[i, 2], :]
-                - self.verts[self.connectivity[i, 0], :]
-            )
-            n = np.cross(u, v)
-            self.normals[i, :] = n / np.linalg.norm(n)
+    verts: np.ndarray
+    connectivity: np.ndarray
+    init_node: Optional[np.ndarray] = None
+    normals: np.ndarray = field(init=False)
+    node_to_tri: dict[int, list[int]] = field(init=False)
+    tree: cKDTree = field(init=False)
 
-        self.tree = cKDTree(verts)
+    def __post_init__(self):
+        self.verts = np.array(self.verts)
+        self.connectivity = np.array(self.connectivity)
 
-    def project_new_point(self, point):
+        self.normals = compute_normals(self.connectivity, verts=self.verts)
+        self.node_to_tri = get_node_to_triangle(connectivity=self.connectivity)
+        self.valid_nodes = np.array(tuple(self.node_to_tri.keys()))
+
+        self.tree = cKDTree(self.verts)
+
+        if self.init_node is None:
+            min_node = self.verts[self.valid_nodes, 0].argmin()
+            self.init_node = self.verts[self.valid_nodes[min_node], :]
+        self.init_node = np.array(self.init_node)
+
+    def project_new_point(self, point) -> ProjectedPoint:
         """This function projects any point to
         the surface defined by the mesh.
 
         Args:
             point (array):
-            coordinates of the point to project.
+                coordinates of the point to project.
 
         Returns:
-            projected_point (array):
-                the coordinates of the projected point that lies in the surface.
-             intriangle (int):
-                the index of the triangle where the projected point lies.
-                If the point is outside surface, intriangle=-1.
+            ProjectedPoint: Contains projected_point which is the coordinates
+            of the projected point that lies in the surface. triangle_index is
+            the index of the triangle where the projected point lies.
+            If the point is outside surface, triangle_index=-1.
+
         """
         # Get the closest point
         d, node = self.tree.query(point)
@@ -87,7 +120,9 @@ class Mesh:
         # Get triangles connected to that node
         triangles = self.node_to_tri[node]
         if len(triangles) == 0:
-            raise Exception("node not connected to triangles, check your mesh")
+            raise InvalidNodeError(
+                f"node {node} with point {point} not connected to triangles, check your mesh"
+            )
 
         # Compute the vertex normal as the avergage of the triangle normals.
         vertex_normal = np.sum(self.normals[triangles], axis=0)
@@ -98,21 +133,18 @@ class Mesh:
             point - self.verts[node], vertex_normal
         )
         # Calculate the distance from point to plane (Closest point projection)
-        CPP = []
-        for tri in triangles:
-            CPP.append(
-                np.dot(
-                    pre_projected_point - self.verts[self.connectivity[tri, 0], :],
-                    self.normals[tri, :],
-                )
-            )
-        CPP = np.array(CPP)
+        CPP = closest_point_projection(
+            triangles, pre_projected_point, self.verts, self.connectivity, self.normals
+        )
         triangles = np.array(triangles)
         # Sort from closest to furthest
         order = np.abs(CPP).argsort()
 
-        # Check if point is in triangle
-        intriangle = -1
+        return self.check_in_triangle(order, triangles, pre_projected_point, CPP)
+
+    def check_in_triangle(
+        self, order, triangles, pre_projected_point, CPP
+    ) -> ProjectedPoint:
         for o in order:
             i = triangles[o]
 
@@ -139,7 +171,6 @@ class Mesh:
                 t = np.linalg.norm(uxw) / np.linalg.norm(vxu)
 
                 if r <= 1 and t <= 1 and (r + t) <= 1.001:
+                    return ProjectedPoint(point=projected_point, triangle_index=i)
 
-                    intriangle = i
-                    break
-        return projected_point, intriangle
+        return ProjectedPoint(point=projected_point, triangle_index=-1)
