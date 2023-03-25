@@ -23,15 +23,11 @@ jobs:
 
   build:
     runs-on: ubuntu-22.04
+    container: ghcr.io/scientificcomputing/fenics-gmsh:2023-02-17a
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
 
       - name: Install dependencies
         run: python3 -m pip install ".[docs]"

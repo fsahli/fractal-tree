@@ -4,10 +4,11 @@ This module contains the function that creates the fractal tree.
 from __future__ import annotations
 from dataclasses import dataclass
 import sys
-from typing import Optional, NamedTuple
+from typing import Optional, NamedTuple, Union
 import numpy as np
 import logging
 import tqdm
+from pathlib import Path
 
 from .branch import Nodes, Branch
 from .mesh import Mesh
@@ -16,7 +17,14 @@ from .viz import write_line_VTU
 logger = logging.getLogger(__name__)
 
 
-def grow_fascicles(branches, parameters, mesh, nodes, lines, last_branch):
+def grow_fascicles(
+    branches: dict[int, Branch],
+    parameters: FractalTreeParameters,
+    mesh: Mesh,
+    nodes: Nodes,
+    lines: list[tuple[int, int]],
+    last_branch: int,
+):
     brother_nodes = []
     brother_nodes += branches[0].nodes
     for i_branch in range(len(parameters.fascicles_angles)):
@@ -38,17 +46,23 @@ def grow_fascicles(branches, parameters, mesh, nodes, lines, last_branch):
 
         for i_n in range(len(branches[last_branch].nodes) - 1):
             lines.append(
-                [
+                (
                     branches[last_branch].nodes[i_n],
                     branches[last_branch].nodes[i_n + 1],
-                ]
+                )
             )
     branches_to_grow = list(range(1, len(parameters.fascicles_angles) + 1))
     return branches_to_grow, last_branch
 
 
 def run_generation(
-    branches_to_grow, parameters, branches, last_branch, mesh, nodes, lines
+    branches_to_grow: list[int],
+    parameters: FractalTreeParameters,
+    branches: dict[int, Branch],
+    last_branch: int,
+    mesh: Mesh,
+    nodes: Nodes,
+    lines: list[tuple[int, int]],
 ):
     choices = 2 * np.random.randint(2, size=len(branches_to_grow)) - 1
     lengths = np.random.normal(0, parameters.std_length, size=2 * len(branches_to_grow))
@@ -56,64 +70,73 @@ def run_generation(
     k1 = 0
     np.random.shuffle(branches_to_grow)
     new_branches_to_grow = []
-    for g in branches_to_grow:
+    for branch_index in branches_to_grow:
+        branch = branches[branch_index]
         angle = -parameters.branch_angle * choices[k]
         k += 1
         for j in range(2):
-            brother_nodes = []
-            brother_nodes += branches[g].nodes
+            brother_nodes = branch.nodes.copy()
             if j > 0:
                 brother_nodes += branches[last_branch].nodes
 
             # Add new branch
             last_branch += 1
             logger.debug(last_branch)
-            l = parameters.length + lengths[k1]
+            total_length = parameters.length + lengths[k1]
             k1 += 1
-            if l < parameters.min_length:
-                l = parameters.min_length
+            if total_length < parameters.min_length:
+                total_length = parameters.min_length
             branches[last_branch] = Branch(
-                mesh,
-                branches[g].nodes[-1],
-                branches[g].dir,
-                branches[g].tri,
-                l,
-                angle,
-                parameters.w,
-                nodes,
-                brother_nodes,
-                int(parameters.length / parameters.l_segment),
+                mesh=mesh,
+                initial_node=branch.nodes[-1],
+                initial_direction=branch.dir,
+                initial_triangle=branch.tri,
+                length=total_length,
+                angle=angle,
+                repulsitivity=parameters.repulsitivity,
+                nodes=nodes,
+                brother_nodes=brother_nodes,
+                num_segments=int(parameters.length / parameters.l_segment),
             )
             # Add nodes to lines
-            for i_n in range(len(branches[last_branch].nodes) - 1):
-                lines.append(
-                    [
-                        branches[last_branch].nodes[i_n],
-                        branches[last_branch].nodes[i_n + 1],
-                    ]
-                )
+            for n1, n2 in zip(
+                branches[last_branch].nodes[:-1], branches[last_branch].nodes[1:]
+            ):
+                lines.append((n1, n2))
 
             # Add to the new array
             if branches[last_branch].growing:
                 new_branches_to_grow.append(last_branch)
 
-            branches[g].child[j] = last_branch
+            branch.child[j] = last_branch
             angle = -angle
+
     branches_to_grow = new_branches_to_grow
     return branches, nodes, lines, branches_to_grow, lines, last_branch
 
 
-def save_tree(parameters, nodes, lines):
-    if parameters.save_paraview:
+def save_tree(
+    filename: Union[Path, str],
+    nodes: Nodes,
+    lines: list[tuple[int, int]],
+    save_paraview: bool = True,
+):
+    if save_paraview:
         logger.info("Finished growing, writing paraview file")
         xyz = np.zeros((len(nodes.nodes), 3))
         for i in range(len(nodes.nodes)):
             xyz[i, :] = nodes.nodes[i]
-        write_line_VTU(xyz, lines, parameters.filename + ".vtu")
-
-    np.savetxt(parameters.filename + "_lines.txt", lines, fmt="%d")
-    np.savetxt(parameters.filename + "_xyz.txt", xyz)
-    np.savetxt(parameters.filename + "_endnodes.txt", nodes.end_nodes, fmt="%d")
+        write_line_VTU(xyz, lines, Path(filename).with_suffix(".vtu"))
+    name = Path(filename).name
+    np.savetxt(
+        Path(filename).with_name(name + "_lines").with_suffix(".txt"), lines, fmt="%d"
+    )
+    np.savetxt(Path(filename).with_name(name + "_xyz").with_suffix(".txt"), xyz)
+    np.savetxt(
+        Path(filename).with_name(name + "_endnodes").with_suffix(".txt"),
+        nodes.end_nodes,
+        fmt="%d",
+    )
 
 
 @dataclass
@@ -141,8 +164,8 @@ class FractalTreeParameters:
         branch_angle (float):
             angle with respect to the direction of
             the previous branch and the new branch.
-        w (float):
-            repulsivity parameter.
+        repulsitivity (float):
+            repulsitivity parameter.
         l_segment (float):
             length of the segments that compose one branch
             (approximately, because the length of the branch is random).
@@ -172,7 +195,7 @@ class FractalTreeParameters:
     N_it: int = 10  # Number of iterations (generations of branches)
     length: float = 0.1  # Median length of the branches
     branch_angle: float = 0.15
-    w: float = 0.1
+    repulsitivity: float = 0.1
     l_segment: float = 0.01  # Length of the segments (approximately, because
     # the length of the branch is random)
     generate_fascicles: bool = True
@@ -278,11 +301,13 @@ def generate_fractal_tree(
     branches_to_grow = []
     branches_to_grow.append(last_branch)
 
-    lines = []
-    for i_n in range(len(branches[last_branch].nodes) - 1):
-        lines.append(
-            [branches[last_branch].nodes[i_n], branches[last_branch].nodes[i_n + 1]]
+    lines = [
+        (n1, n2)
+        for n1, n2 in zip(
+            branches[last_branch].nodes[:-1], branches[last_branch].nodes[1:]
         )
+    ]
+
     # To grow fascicles
     if parameters.generate_fascicles:
         branches_to_grow, last_branch = grow_fascicles(
@@ -295,6 +320,11 @@ def generate_fractal_tree(
         )
 
     if parameters.save:
-        save_tree(parameters, nodes, lines)
+        save_tree(
+            filename=parameters.filename,
+            nodes=nodes,
+            lines=lines,
+            save_paraview=parameters.save_paraview,
+        )
 
     return FractalTreeResult(branches, nodes)

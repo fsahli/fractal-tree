@@ -2,11 +2,11 @@
 This module contains the Branch class (one branch of the tree)
 and the Nodes class name
 """
-
+from __future__ import annotations
 import numpy as np
 import logging
 from scipy.spatial import cKDTree
-from .mesh import InvalidNodeError
+from .mesh import InvalidNodeError, Mesh
 
 logger = logging.getLogger(__name__)
 
@@ -63,16 +63,16 @@ class Branch:
 
     def __init__(
         self,
-        mesh,
-        initial_node,
-        initial_direction,
-        initial_triangle,
-        length,
-        angle,
-        repulsitivity,
-        nodes,
-        brother_nodes,
-        num_segments,
+        mesh: Mesh,
+        initial_node: int,
+        initial_direction: np.ndarray,
+        initial_triangle: int,
+        length: float,
+        angle: float,
+        repulsitivity: float,
+        nodes: "Nodes",
+        brother_nodes: list[int],
+        num_segments: int,
     ):
         self.child = [0, 0]
         self.dir = np.array([0.0, 0.0, 0.0])
@@ -81,55 +81,77 @@ class Branch:
 
         self.queue = []
         self.growing = True
-        init_normal = mesh.normals[initial_triangle]
-        nodes.update_collision_tree(brother_nodes)
 
-        inplane = -np.cross(initial_direction, init_normal)
-        dir = np.cos(angle) * initial_direction + np.sin(angle) * inplane
-        dir = dir / np.linalg.norm(dir)
+        nodes.update_collision_tree(brother_nodes)
         self.nodes.append(initial_node)
         self.queue.append(nodes.nodes[initial_node])
         self.triangles.append(initial_triangle)
         grad = nodes.gradient(self.queue[0])
-        dir = (dir + repulsitivity * grad) / np.linalg.norm(dir + repulsitivity * grad)
+
+        self._initialize_direction(
+            init_normal=mesh.normals[initial_triangle],
+            initial_direction=initial_direction,
+            angle=angle,
+        )
+        self._update_direction(repulsitivity=repulsitivity, grad=grad)
 
         for i in range(1, num_segments):
-            intriangle = self.add_node_to_queue(
-                mesh, self.queue[i - 1], dir * length / num_segments
-            )
+            self._grow(mesh, length, i, num_segments, nodes, repulsitivity)
+            if not self.growing:
+                break
 
-            if not intriangle:
-                logger.debug(f"Point {i} not in triangle")
-                self.growing = False
-                break
-            collision = nodes.collision(self.queue[i])
-            if collision[1] < length / 5.0:
-                logger.debug(f"Collision {i}: {collision}")
-                self.growing = False
-                self.queue.pop()
-                self.triangles.pop()
-                collision[0]
-                break
-            grad = nodes.gradient(self.queue[i])
-            normal = mesh.normals[self.triangles[i], :]
-            # Project the gradient to the surface
-            grad = grad - (np.dot(grad, normal)) * normal
-            dir = (dir + repulsitivity * grad) / np.linalg.norm(
-                dir + repulsitivity * grad
-            )
-        nodes_id = nodes.add_nodes(self.queue[1:])
-        [self.nodes.append(x) for x in nodes_id]
+        self.nodes += nodes.add_nodes(self.queue[1:])
         if not self.growing:
             nodes.end_nodes.append(self.nodes[-1])
-        self.dir = dir
 
         self.tri = self.triangles[-1]
 
-    # Uncomment the following lines for a closed network
-    #   if shared_node is not -1:
-    #      self.nodes.append(shared_node)
+    def _initialize_direction(
+        self, init_normal: np.ndarray, initial_direction: np.ndarray, angle: float
+    ) -> None:
+        inplane = -np.cross(initial_direction, init_normal)
+        self.dir = np.cos(angle) * initial_direction + np.sin(angle) * inplane
+        self.dir /= np.linalg.norm(self.dir)
 
-    def add_node_to_queue(self, mesh, initial_node, dir) -> bool:
+    def _grow(
+        self,
+        mesh: Mesh,
+        length: float,
+        i: int,
+        num_segments: int,
+        nodes: "Nodes",
+        repulsitivity: float,
+    ) -> None:
+        intriangle = self.add_node_to_queue(
+            mesh, self.queue[i - 1], self.dir * length / num_segments
+        )
+        if not intriangle:
+            logger.debug(f"Point {i} not in triangle")
+            self.growing = False
+            return
+
+        collision = nodes.collision(self.queue[i])
+        if collision[1] < length / 5.0:
+            logger.debug(f"Collision {i}: {collision}")
+            self.growing = False
+            self.queue.pop()
+            self.triangles.pop()
+            return
+
+        grad = nodes.gradient(self.queue[i])
+        normal = mesh.normals[self.triangles[i], :]
+        # Project the gradient to the surface
+        grad = grad - (np.dot(grad, normal)) * normal
+        self._update_direction(repulsitivity=repulsitivity, grad=grad)
+
+    def _update_direction(self, repulsitivity: float, grad: np.ndarray) -> None:
+        self.dir = (self.dir + repulsitivity * grad) / np.linalg.norm(
+            self.dir + repulsitivity * grad
+        )
+
+    def add_node_to_queue(
+        self, mesh: Mesh, initial_node: np.ndarray, dir: np.ndarray
+    ) -> bool:
         """Functions that projects a node in the mesh surface
         and it to the queue is it lies in the surface.
 
@@ -153,12 +175,11 @@ class Branch:
         except InvalidNodeError:
             return False
 
+        success = False
         if triangle >= 0:
             self.queue.append(point)
             self.triangles.append(triangle)
             success = True
-        else:
-            success = False
 
         return success
 
@@ -189,14 +210,13 @@ class Nodes:
 
     """
 
-    def __init__(self, initial_node):
-        self.nodes = []
-        self.nodes.append(initial_node)
+    def __init__(self, initial_node: np.ndarray) -> None:
+        self.nodes = [initial_node]
         self.last_node = 0
-        self.end_nodes = []
+        self.end_nodes: list[int] = []
         self.tree = cKDTree(self.nodes)
 
-    def add_nodes(self, queue):
+    def add_nodes(self, queue: list[np.ndarray]) -> list[int]:
         """This function stores a list of nodes of a branch and
         returns the node indices. It also updates the tree to compute distances.
 
@@ -213,10 +233,11 @@ class Nodes:
             self.nodes.append(point)
             self.last_node += 1
             nodes_id.append(self.last_node)
+
         self.tree = cKDTree(self.nodes)
         return nodes_id
 
-    def distance_from_point(self, point):
+    def distance_from_point(self, point: np.ndarray) -> float:
         """This function returns the distance from any
         point to the closest node in the tree.
 
@@ -228,11 +249,9 @@ class Nodes:
             d (float):
             the distance between point and the closest node in the tree.
         """
-        d, node = self.tree.query(point)
-        #      distance=pool.map(lambda a: np.linalg.norm(a-point),self.nodes.values())
-        return d
+        return self.tree.query(point)[0]
 
-    def distance_from_node(self, node):
+    def distance_from_node(self, node: int) -> float:
         """This function returns the distance from any
         node to the closest node in the tree.
 
@@ -244,16 +263,14 @@ class Nodes:
             d (float):
                 the distance between specified node and the closest node in the tree.
         """
-        d, node = self.tree.query(self.nodes[node])
-        #     distance=pool.map(lambda a: np.linalg.norm(a-self.nodes[node]),self.nodes.values())
-        return d
+        return self.distance_from_point(self.nodes[node])
 
-    def update_collision_tree(self, nodes_to_exclude):
+    def update_collision_tree(self, nodes_to_exclude: list[int]) -> None:
         """This function updates the collision_tree excluding a
         list of nodes from all the nodes in the tree. If all the
         existing nodes are excluded, one distant node is added.
 
-        Args:
+        Args
             nodes_to_exclude (list):
                 contains the nodes to exclude from the tree.
                 Usually it should be the mother and the brother branch nodes.
@@ -261,19 +278,19 @@ class Nodes:
         Returns:
             none
         """
-        nodes = set(range(len(self.nodes)))
-        nodes = nodes.difference(nodes_to_exclude)
+        nodes = set(range(len(self.nodes))).difference(nodes_to_exclude)
         nodes_to_consider = [self.nodes[x] for x in nodes]
-        self.nodes_to_consider_keys = [x for x in nodes]
+        self.nodes_to_consider_keys = list(nodes)
         if len(nodes_to_consider) == 0:
             nodes_to_consider = [
                 np.array([-100000000000.0, -100000000000.0, -100000000000.0])
             ]
             self.nodes_to_consider_keys = [100000000]
             logger.debug("no nodes to consider")
+
         self.collision_tree = cKDTree(nodes_to_consider)
 
-    def collision(self, point):
+    def collision(self, point: np.ndarray):
         """This function returns the distance between one point and
         the closest node in the tree and the index of the closest
         node using the collision_tree.
@@ -290,7 +307,7 @@ class Nodes:
         collision = (self.nodes_to_consider_keys[node], d)
         return collision
 
-    def gradient(self, point):
+    def gradient(self, point: np.ndarray, delta: float = 0.01):
         """This function returns the gradient of the distance from
         the existing points of the tree from any point. It uses a
         central finite difference approximation.
@@ -303,21 +320,26 @@ class Nodes:
             grad (array):
                 (x,y,z) components of gradient of the distance.
         """
-        delta = 0.01
+
         dx = np.array([delta, 0, 0])
         dy = np.array([0.0, delta, 0.0])
         dz = np.array([0.0, 0.0, delta])
-        distx_m = self.distance_from_point(point - dx)
-        distx_p = self.distance_from_point(point + dx)
-        disty_m = self.distance_from_point(point - dy)
-        disty_p = self.distance_from_point(point + dy)
-        distz_m = self.distance_from_point(point - dz)
-        distz_p = self.distance_from_point(point + dz)
+
+        diff = [
+            point - dx,
+            point + dx,
+            point - dy,
+            point + dy,
+            point - dz,
+            point + dz,
+        ]
+        xm, xp, ym, yp, zm, zp = self.tree.query(diff)[0]
+
         grad = np.array(
             [
-                (distx_p - distx_m) / (2 * delta),
-                (disty_p - disty_m) / (2 * delta),
-                (distz_p - distz_m) / (2 * delta),
+                (xp - xm) / (2 * delta),
+                (yp - ym) / (2 * delta),
+                (zp - zm) / (2 * delta),
             ]
         )
         return grad

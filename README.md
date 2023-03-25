@@ -2,30 +2,45 @@
 
 This code is to create a fractal tree over a surface discretized by triangles. It was developed to create a representation of the Purkinje network in the ventricles of the human heart.
 
-Read the documentation in [fractal-tree.readthedocs.org](http://fractal-tree.readthedocs.org/en/latest/).
+Note that this is a rewrite of the original code found at https://github.com/fsahli/fractal-tree
 
 The details of the algorithm are presented in this [article](http://www.sciencedirect.com/science/article/pii/S0021929015007332). If you are going to use this code, please cite:
 
 > Generating Purkinje networks in the human heart. F. Sahli Costabal, D. Hurtado and E. Kuhl. Journal of Biomechanics, doi:10.1016/j.jbiomech.2015.12.025
 
+- Source code: https://github.com/finsberg/fractal-tree
+- Documentation: https://github.com/finsberg/fractal-tree
 
-**Pre-requisites:**
+## Install
+You can install the library with pip
+```
+python3 -m pip install fractal-tree
+```
+Note that you also need a way to load the mesh from e.g gmsh or another meshing tool. For this we recommend to use [`meshio`](https://github.com/nschloe/meshio) as it support the most common formats.
 
-* Numpy
-* Scipy
+## Getting started
 
-You will need .obj mesh file to create the tree. A very nice software to manipulate the mesh and export it to .obj is [MeshLab](http://meshlab.sourceforge.net). Please check if the mesh has duplicated vertex or faces before running the code. Also the orientation of the normals can change your results, because the angles will be flipped. To visualize the output, the best alternative is [Paraview](http://www.paraview.org).
-
-To define the mesh file and the parameters of the tree to use, edit the parameters.py file and then run:
+The following illustrates a minimal example, assuming that you have surface mesh called `sphere.obj` in your current directory.
 
 ```python
-from fractal_tree.tree import FractalTree3D
-from fractal_tree.mesh import Mesh
-from fractal_tree.parameters import Parameters
+import meshio
+import numpy as np
+from fractal_tree import generate_fractal_tree, FractalTreeParameters, Mesh
 
-param = Parameters()
-mesh = Mesh(param.meshfile)
-branches, nodes = FractalTree3D(mesh, param)
+msh = meshio.read("sphere.obj")
+mesh = Mesh(verts=msh.points, connectivity=msh.cells[0].data)
+param = FractalTreeParameters(
+    filename="sphere-line",
+    N_it=10,
+)
+branches, nodes = generate_fractal_tree(mesh, param)
 ```
 
-If you have questions you can contact me at francisco.sahli  at  gmail.com
+For a more elaborate example you can checkout the [gmsh example](https://github.com/finsberg/fractal-tree/examples/demo_gmsh.html).
+
+
+## License
+MIT
+
+## Need help or having issues
+Please submit an [issue](https://github.com/finsberg/fractal-tree/issues)
