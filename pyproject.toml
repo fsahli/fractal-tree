@@ -22,7 +22,7 @@ test = [
 ]
 demo = [
     "meshio",
-    "cardiac-geometries",
+    "cardiac-geometries[gmsh]",
 ]
 dev = [
     "pdbpp",
