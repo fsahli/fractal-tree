@@ -36,7 +36,7 @@ param = FractalTreeParameters(
 branches, nodes = generate_fractal_tree(mesh, param)
 ```
 
-For a more elaborate example you can checkout the [gmsh example](https://github.com/finsberg/fractal-tree/examples/demo_gmsh.html).
+For a more elaborate example you can checkout the [gmsh example](https://finsberg.github.io/fractal-tree/examples/demo_gmsh.html).
 
 
 ## License
