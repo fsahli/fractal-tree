@@ -22,6 +22,7 @@ test = [
 ]
 demo = [
     "meshio",
+    "cardiac-geometries",
 ]
 dev = [
     "pdbpp",
@@ -35,7 +36,8 @@ pypi = [
 ]
 docs = [
    "jupyter-book",
-   "sphinx-autoapi"
+   "sphinx-autoapi",
+   "fractal_tree[demo]"
 ]
 all = [
    "fractal_tree[test]",
