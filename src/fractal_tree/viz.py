@@ -1,3 +1,4 @@
+from __future__ import annotations
 import xml.etree.cElementTree as ET
 from typing import Union
 from pathlib import Path
