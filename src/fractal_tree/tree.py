@@ -4,10 +4,11 @@ This module contains the function that creates the fractal tree.
 from __future__ import annotations
 from dataclasses import dataclass
 import sys
-from typing import Optional, NamedTuple
+from typing import Optional, NamedTuple, Union
 import numpy as np
 import logging
 import tqdm
+from pathlib import Path
 
 from .branch import Nodes, Branch
 from .mesh import Mesh
@@ -16,7 +17,14 @@ from .viz import write_line_VTU
 logger = logging.getLogger(__name__)
 
 
-def grow_fascicles(branches, parameters, mesh, nodes, lines, last_branch):
+def grow_fascicles(
+    branches: dict[int, Branch],
+    parameters: FractalTreeParameters,
+    mesh: Mesh,
+    nodes: Nodes,
+    lines: list[tuple[int, int]],
+    last_branch: int,
+):
     brother_nodes = []
     brother_nodes += branches[0].nodes
     for i_branch in range(len(parameters.fascicles_angles)):
@@ -38,10 +46,10 @@ def grow_fascicles(branches, parameters, mesh, nodes, lines, last_branch):
 
         for i_n in range(len(branches[last_branch].nodes) - 1):
             lines.append(
-                [
+                (
                     branches[last_branch].nodes[i_n],
                     branches[last_branch].nodes[i_n + 1],
-                ]
+                )
             )
     branches_to_grow = list(range(1, len(parameters.fascicles_angles) + 1))
     return branches_to_grow, last_branch
@@ -50,11 +58,11 @@ def grow_fascicles(branches, parameters, mesh, nodes, lines, last_branch):
 def run_generation(
     branches_to_grow: list[int],
     parameters: FractalTreeParameters,
-    branches,
-    last_branch,
-    mesh,
-    nodes,
-    lines,
+    branches: dict[int, Branch],
+    last_branch: int,
+    mesh: Mesh,
+    nodes: Nodes,
+    lines: list[tuple[int, int]],
 ):
     choices = 2 * np.random.randint(2, size=len(branches_to_grow)) - 1
     lengths = np.random.normal(0, parameters.std_length, size=2 * len(branches_to_grow))
@@ -107,17 +115,28 @@ def run_generation(
     return branches, nodes, lines, branches_to_grow, lines, last_branch
 
 
-def save_tree(parameters, nodes, lines):
-    if parameters.save_paraview:
+def save_tree(
+    filename: Union[Path, str],
+    nodes: Nodes,
+    lines: list[tuple[int, int]],
+    save_paraview: bool = True,
+):
+    if save_paraview:
         logger.info("Finished growing, writing paraview file")
         xyz = np.zeros((len(nodes.nodes), 3))
         for i in range(len(nodes.nodes)):
             xyz[i, :] = nodes.nodes[i]
-        write_line_VTU(xyz, lines, parameters.filename + ".vtu")
-
-    np.savetxt(parameters.filename + "_lines.txt", lines, fmt="%d")
-    np.savetxt(parameters.filename + "_xyz.txt", xyz)
-    np.savetxt(parameters.filename + "_endnodes.txt", nodes.end_nodes, fmt="%d")
+        write_line_VTU(xyz, lines, Path(filename).with_suffix(".vtu"))
+    name = Path(filename).name
+    np.savetxt(
+        Path(filename).with_name(name + "_lines").with_suffix(".txt"), lines, fmt="%d"
+    )
+    np.savetxt(Path(filename).with_name(name + "_xyz").with_suffix(".txt"), xyz)
+    np.savetxt(
+        Path(filename).with_name(name + "_endnodes").with_suffix(".txt"),
+        nodes.end_nodes,
+        fmt="%d",
+    )
 
 
 @dataclass
@@ -282,11 +301,13 @@ def generate_fractal_tree(
     branches_to_grow = []
     branches_to_grow.append(last_branch)
 
-    lines = []
-    for i_n in range(len(branches[last_branch].nodes) - 1):
-        lines.append(
-            [branches[last_branch].nodes[i_n], branches[last_branch].nodes[i_n + 1]]
+    lines = [
+        (n1, n2)
+        for n1, n2 in zip(
+            branches[last_branch].nodes[:-1], branches[last_branch].nodes[1:]
         )
+    ]
+
     # To grow fascicles
     if parameters.generate_fascicles:
         branches_to_grow, last_branch = grow_fascicles(
@@ -299,6 +320,11 @@ def generate_fractal_tree(
         )
 
     if parameters.save:
-        save_tree(parameters, nodes, lines)
+        save_tree(
+            filename=parameters.filename,
+            nodes=nodes,
+            lines=lines,
+            save_paraview=parameters.save_paraview,
+        )
 
     return FractalTreeResult(branches, nodes)

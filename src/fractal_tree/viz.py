@@ -1,7 +1,12 @@
 import xml.etree.cElementTree as ET
+from typing import Union
+from pathlib import Path
+import numpy as np
 
 
-def write_line_VTU(nodes, elements, filename):
+def write_line_VTU(
+    nodes: np.ndarray, elements: list[tuple[int, int]], filename: Union[Path, str]
+) -> None:
     file = ET.Element("VTKFile")
     file.set("type", "UnstructuredGrid")
     file.set("version", "0.1")
@@ -43,4 +48,3 @@ def write_line_VTU(nodes, elements, filename):
     DAc3.text = "\n".join(map(str, range(2, len(elements) * 2 + 1, 2)))
     tree = ET.ElementTree(file)
     tree.write(filename)
-    return
