@@ -5,6 +5,9 @@ parts:
   - caption: Getting started
     chapters:
     - file: docs/install
+  - caption: Examples
+    chapters:
+    - file: examples/demo_obj.ipynb
   - caption: API documentation
     chapters:
     - file: CONTRIBUTING

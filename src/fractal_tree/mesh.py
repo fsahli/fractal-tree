@@ -19,7 +19,7 @@ def closest_point_projection(
     ).sum(-1)
 
 
-def get_node_to_triangle(connectivity):
+def get_node_to_triangle(connectivity: np.ndarray) -> dict[int, list[int]]:
     node_to_tri = collections.defaultdict(list)
     for i in range(len(connectivity)):
         for j in range(3):
@@ -27,7 +27,7 @@ def get_node_to_triangle(connectivity):
     return node_to_tri
 
 
-def compute_normals(connectivity, verts):
+def compute_normals(connectivity: np.ndarray, verts: np.ndarray) -> np.ndarray:
     U = verts[connectivity[:, 1], :] - verts[connectivity[:, 0], :]
     V = verts[connectivity[:, 2], :] - verts[connectivity[:, 0], :]
     N = np.cross(U, V)
@@ -99,7 +99,7 @@ class Mesh:
             self.init_node = self.verts[self.valid_nodes[min_node], :]
         self.init_node = np.array(self.init_node)
 
-    def project_new_point(self, point) -> ProjectedPoint:
+    def project_new_point(self, point: np.ndarray) -> ProjectedPoint:
         """This function projects any point to
         the surface defined by the mesh.
 
@@ -115,7 +115,7 @@ class Mesh:
 
         """
         # Get the closest point
-        d, node = self.tree.query(point)
+        node = self.tree.query(point)[1]
 
         # Get triangles connected to that node
         triangles = self.node_to_tri[node]

@@ -48,7 +48,13 @@ def grow_fascicles(branches, parameters, mesh, nodes, lines, last_branch):
 
 
 def run_generation(
-    branches_to_grow, parameters, branches, last_branch, mesh, nodes, lines
+    branches_to_grow: list[int],
+    parameters: FractalTreeParameters,
+    branches,
+    last_branch,
+    mesh,
+    nodes,
+    lines,
 ):
     choices = 2 * np.random.randint(2, size=len(branches_to_grow)) - 1
     lengths = np.random.normal(0, parameters.std_length, size=2 * len(branches_to_grow))
@@ -56,49 +62,47 @@ def run_generation(
     k1 = 0
     np.random.shuffle(branches_to_grow)
     new_branches_to_grow = []
-    for g in branches_to_grow:
+    for branch_index in branches_to_grow:
+        branch = branches[branch_index]
         angle = -parameters.branch_angle * choices[k]
         k += 1
         for j in range(2):
-            brother_nodes = []
-            brother_nodes += branches[g].nodes
+            brother_nodes = branch.nodes.copy()
             if j > 0:
                 brother_nodes += branches[last_branch].nodes
 
             # Add new branch
             last_branch += 1
             logger.debug(last_branch)
-            l = parameters.length + lengths[k1]
+            total_length = parameters.length + lengths[k1]
             k1 += 1
-            if l < parameters.min_length:
-                l = parameters.min_length
+            if total_length < parameters.min_length:
+                total_length = parameters.min_length
             branches[last_branch] = Branch(
-                mesh,
-                branches[g].nodes[-1],
-                branches[g].dir,
-                branches[g].tri,
-                l,
-                angle,
-                parameters.w,
-                nodes,
-                brother_nodes,
-                int(parameters.length / parameters.l_segment),
+                mesh=mesh,
+                initial_node=branch.nodes[-1],
+                initial_direction=branch.dir,
+                initial_triangle=branch.tri,
+                length=total_length,
+                angle=angle,
+                repulsitivity=parameters.repulsitivity,
+                nodes=nodes,
+                brother_nodes=brother_nodes,
+                num_segments=int(parameters.length / parameters.l_segment),
             )
             # Add nodes to lines
-            for i_n in range(len(branches[last_branch].nodes) - 1):
-                lines.append(
-                    [
-                        branches[last_branch].nodes[i_n],
-                        branches[last_branch].nodes[i_n + 1],
-                    ]
-                )
+            for n1, n2 in zip(
+                branches[last_branch].nodes[:-1], branches[last_branch].nodes[1:]
+            ):
+                lines.append((n1, n2))
 
             # Add to the new array
             if branches[last_branch].growing:
                 new_branches_to_grow.append(last_branch)
 
-            branches[g].child[j] = last_branch
+            branch.child[j] = last_branch
             angle = -angle
+
     branches_to_grow = new_branches_to_grow
     return branches, nodes, lines, branches_to_grow, lines, last_branch
 
@@ -141,8 +145,8 @@ class FractalTreeParameters:
         branch_angle (float):
             angle with respect to the direction of
             the previous branch and the new branch.
-        w (float):
-            repulsivity parameter.
+        repulsitivity (float):
+            repulsitivity parameter.
         l_segment (float):
             length of the segments that compose one branch
             (approximately, because the length of the branch is random).
@@ -172,7 +176,7 @@ class FractalTreeParameters:
     N_it: int = 10  # Number of iterations (generations of branches)
     length: float = 0.1  # Median length of the branches
     branch_angle: float = 0.15
-    w: float = 0.1
+    repulsitivity: float = 0.1
     l_segment: float = 0.01  # Length of the segments (approximately, because
     # the length of the branch is random)
     generate_fascicles: bool = True
