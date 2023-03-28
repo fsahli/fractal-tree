@@ -1,7 +1,0 @@
-Fractal_Tree_3D module
-======================
-
-.. automodule:: Fractal_Tree_3D
-    :members:
-    :undoc-members:
-    :show-inheritance:

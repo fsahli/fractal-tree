@@ -1,0 +1,42 @@
+name: Test package
+
+on: [push]
+jobs:
+
+  test-code:
+    # This code depends on the result of check-code
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, windows-latest, macos-12]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: actions/checkout@v3
+
+      - name: Install package
+        run: python3 -m pip install -e .[test]
+
+      - name: Run tests
+        run: python3 -m pytest
+
+      - name: Coverage report
+        if: github.ref == 'refs/heads/main' && matrix.python-version == '3.10' && runner.os == 'Linux'
+        run: |
+          python3 -m coverage report | sed 's/^/    /' >> $GITHUB_STEP_SUMMARY
+          python3 -m coverage json
+          export TOTAL=$(python -c "import json;print(json.load(open('coverage.json'))['totals']['percent_covered_display'])")
+          echo "total=$TOTAL" >> $GITHUB_ENV
+
+      - name: Upload HTML report.
+        if: github.ref == 'refs/heads/main' && matrix.python-version == '3.10' && runner.os == 'Linux'
+        uses: actions/upload-artifact@v3
+        with:
+          name: html-report
+          path: htmlcov

@@ -1,0 +1,112 @@
+[build-system] # Require setuptool version due to https://github.com/pypa/setuptools/issues/2938
+requires = ["setuptools>=61.0.0", "wheel"]
+
+[project]
+name = "fractal-tree"
+version = "0.2.0"
+description = "Create a fractal tree over a surface discretized by triangles"
+authors = [{name = "Francisco Sahli Costabal" },{name = "Henrik Finsberg", email = "henriknf@simula.no"}]
+license = {file = "LICENSE"}
+readme = "README.md"
+dependencies = [
+    "numpy",
+    "scipy",
+    "tqdm"
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+    "meshio",
+]
+demo = [
+    "meshio",
+    "cardiac-geometries[gmsh]",
+]
+dev = [
+    "pdbpp",
+    "ipython",
+    "bump2version",
+    "pre-commit",
+]
+pypi = [
+    "twine",
+    "build"
+]
+docs = [
+   "jupyter-book",
+   "sphinx-autoapi",
+   "fractal_tree[demo]"
+]
+all = [
+   "fractal_tree[test]",
+   "fractal_tree[docs]",
+   "fractal_tree[pypi]",
+   "fractal_tree[dev]"
+]
+
+[tool.setuptools]
+license-files = ["LICENSE_fsahli"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+
+[tool.pytest.ini_options]
+addopts = [
+   "--cov=fractal_tree",
+   "--cov-report=html",
+   "--cov-report=term-missing",
+   "-v"
+]
+
+testpaths = [
+    "tests"
+]
+
+[tool.ruff]
+# Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.
+select = ["E", "F"]
+ignore = ["E402", "E741"]
+
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+fixable = ["A", "B", "C", "D", "E", "F"]
+unfixable = []
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+
+# Same as Black.
+line-length = 100
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# Assume Python 3.10.
+target-version = "py310"
+
+[tool.ruff.mccabe]
+# Unlike Flake8, default to a complexity level of 10.
+max-complexity = 10

@@ -1,7 +1,0 @@
-sphere_parameters module
-========================
-
-.. automodule:: sphere_parameters
-    :members:
-    :undoc-members:
-    :show-inheritance:
